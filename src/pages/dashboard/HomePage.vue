@@ -1,9 +1,14 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import * as homeApi from '../../services/home/home.api'
+import * as inventoryApi from '../../services/inventory/inventory.api'
 import { toUserMessage } from '../../utils/errorMessage'
 import EmptyState from '../../components/common/EmptyState.vue'
 import BookingFeedCard from '../../components/home/BookingFeedCard.vue'
+
+const statsLoading = ref(true)
+const statsError = ref(null)
+const stats = ref([])
 
 const feedLoading = ref(true)
 const feedError = ref(null)
@@ -50,6 +55,43 @@ const locationOptions = computed(() => [
   ...locations.value.map((location) => ({ title: location.name, value: location.id })),
 ])
 
+// "Asset Under Management" rolls up every status a vehicle can be in while
+// still part of the active fleet — everything up to (but not including)
+// Returned/Sold/Scrapped, matching VehicleStatusBadge.vue's numeric enum
+// (0 Available … 5 Water Wash) — so it's the one stat card that maps to a
+// *set* of vehicle statuses rather than a single one, and needs its own
+// hardcoded list here rather than the per-stat `status` field the other
+// cards (Available, Booked, Under Service, ...) use below.
+const ASSET_UNDER_MANAGEMENT_STATUSES = [0, 1, 2, 3, 4, 5]
+
+// A-109's per-stat `status` field (docs/api-reference.md) — ASSUMPTION:
+// the same numeric enum VehicleStatusBadge.vue already documents for the
+// vehicles list, since both describe the same vehicle-status domain;
+// not independently confirmed for this specific endpoint. The `Total`
+// entry has no single status, so it (and anything else without one)
+// simply isn't linked.
+function statLink(stat) {
+  if (stat.label === 'Asset Under Management') {
+    return { name: 'vehicles', query: { statuses: ASSET_UNDER_MANAGEMENT_STATUSES.join(',') } }
+  }
+  if (stat.status !== undefined && stat.status !== null) {
+    return { name: 'vehicles', query: { statuses: String(stat.status) } }
+  }
+  return null
+}
+
+async function loadStats() {
+  statsLoading.value = true
+  statsError.value = null
+  try {
+    stats.value = await inventoryApi.fetchInventoryStats()
+  } catch (error) {
+    statsError.value = error
+  } finally {
+    statsLoading.value = false
+  }
+}
+
 async function loadFeed() {
   feedLoading.value = true
   feedError.value = null
@@ -72,6 +114,7 @@ async function loadLocations() {
 }
 
 onMounted(() => {
+  loadStats()
   loadFeed()
   loadLocations()
 })
@@ -79,6 +122,42 @@ onMounted(() => {
 
 <template>
   <div>
+    <!-- Fleet inventory stat strip (A-109) -->
+    <div v-if="statsLoading" class="d-flex ga-3 mb-6" style="overflow-x: auto">
+      <v-skeleton-loader v-for="n in 6" :key="n" type="card" width="160" height="90" />
+    </div>
+    <EmptyState
+      v-else-if="statsError"
+      icon="mdi-alert-circle-outline"
+      title="Couldn't load fleet stats"
+      :message="toUserMessage(statsError)"
+      class="mb-6"
+    >
+      <v-btn class="mt-2" variant="tonal" color="primary" @click="loadStats">Retry</v-btn>
+    </EmptyState>
+    <div v-else class="d-flex ga-3 mb-6 pb-1" style="overflow-x: auto">
+      <v-card
+        v-for="stat in stats"
+        :key="stat.label"
+        variant="outlined"
+        rounded="lg"
+        class="pa-4 flex-shrink-0"
+        style="min-width: 160px"
+        :to="statLink(stat)"
+        :link="Boolean(statLink(stat))"
+      >
+        <div class="d-flex align-baseline ga-2">
+          <span class="text-h5 font-weight-bold">{{ stat.count }}</span>
+          <span v-if="stat.percentage !== undefined" class="text-caption text-success">
+            {{ stat.percentage }}%
+          </span>
+        </div>
+        <div class="text-caption font-weight-medium text-medium-emphasis text-no-wrap">
+          {{ stat.label }}
+        </div>
+      </v-card>
+    </div>
+
     <!-- Delivery-type filter + location filter -->
     <div class="d-flex align-center flex-wrap ga-3 mb-4">
       <v-btn-toggle

@@ -255,9 +255,9 @@ async function save() {
           v-if="step === 1"
           variant="flat"
           color="primary"
+          rounded="lg"
           :disabled="isNextDisabled"
           @click="step = 2"
-          rounded="lg"
         >
           Next
         </v-btn>
