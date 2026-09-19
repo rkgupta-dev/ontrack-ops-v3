@@ -1,0 +1,21 @@
+html,
+body,
+#app {
+  height: 100%;
+}
+
+/* Pill/chip button rows (tab strips, status filters) — wraps into
+   multiple rows on wider screens, but on small screens that pushes page
+   content down a lot, so it scrolls horizontally as one row instead. */
+@media (max-width: 600px) {
+  .pill-scroll {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .pill-scroll > * {
+    flex-shrink: 0;
+  }
+}
