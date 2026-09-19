@@ -290,10 +290,18 @@ onMounted(() => load(true))
                   { title: 'Received from Customer', value: 'credit' },
                   { title: 'Paid to Customer', value: 'debit' },
                 ]"
+                variant="outlined"
+                rounded="lg"
               />
             </v-col>
             <v-col cols="6">
-              <v-select v-model="addForm.service" label="Service *" :items="SERVICE_OPTIONS" />
+              <v-select
+                v-model="addForm.service"
+                label="Service *"
+                :items="SERVICE_OPTIONS"
+                variant="outlined"
+                rounded="lg"
+              />
             </v-col>
             <v-col cols="6">
               <v-text-field
@@ -301,23 +309,50 @@ onMounted(() => load(true))
                 v-model="addForm.refundedAmount"
                 type="number"
                 label="Refunded Amount"
+                variant="outlined"
+                rounded="lg"
               />
-              <v-text-field v-else v-model="addForm.amount" type="number" label="Received Amount" />
+              <v-text-field
+                v-else
+                v-model="addForm.amount"
+                type="number"
+                label="Received Amount"
+                variant="outlined"
+                rounded="lg"
+              />
             </v-col>
             <v-col cols="6">
-              <v-select v-model="addForm.source" label="Source *" :items="SOURCE_OPTIONS" />
+              <v-select
+                v-model="addForm.source"
+                label="Source *"
+                :items="SOURCE_OPTIONS"
+                variant="outlined"
+                rounded="lg"
+              />
             </v-col>
             <v-col v-if="addForm.transactionType === 'credit'" cols="6">
-              <v-text-field v-model="addForm.paymentId" label="Payment ID" />
+              <v-text-field
+                v-model="addForm.paymentId"
+                label="Payment ID"
+                variant="outlined"
+                rounded="lg"
+              />
             </v-col>
             <v-col v-else cols="6">
-              <v-text-field v-model="addForm.refundId" label="Refund ID" />
+              <v-text-field
+                v-model="addForm.refundId"
+                label="Refund ID"
+                rounded="lg"
+                variant="outlined"
+              />
             </v-col>
             <v-col cols="8">
               <v-text-field
                 v-model="addForm.paymentReceivedDate"
                 type="date"
                 label="Payment Date *"
+                rounded="lg"
+                variant="outlined"
               />
             </v-col>
             <v-col cols="4">
@@ -325,10 +360,18 @@ onMounted(() => load(true))
                 v-model="addForm.paymentReceivedTime"
                 type="time"
                 label="Payment Time *"
+                rounded="lg"
+                variant="outlined"
               />
             </v-col>
             <v-col cols="12">
-              <v-textarea v-model="addForm.comment" label="Comment" rows="2" />
+              <v-textarea
+                v-model="addForm.comment"
+                label="Comment"
+                rows="2"
+                rounded="lg"
+                variant="outlined"
+              />
             </v-col>
             <v-col cols="12">
               <v-checkbox
