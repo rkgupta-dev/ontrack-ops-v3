@@ -19,9 +19,13 @@ export const vuetify = createVuetify({
     },
   },
   defaults: {
-    VBtn: { style: 'text-transform: none; letter-spacing: normal;' },
+    VBtn: {
+      style: 'text-transform: none; letter-spacing: normal;',
+      rounded: 'lg',
+      variant: 'flat',
+    },
     VCard: { rounded: 'lg', variant: 'outlined', style: 'border-color: #E0E0E0;' },
-    VTextField: { variant: 'outlined', density: 'comfortable' },
+    VTextField: { variant: 'outlined', density: 'comfortable', rounded: 'lg' },
     // The outlined VCard default above is transparent by design (fine for
     // content cards sitting on the white page background) — but a dialog's
     // card needs an opaque surface to actually stand out against its own
