@@ -1,98 +1,92 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import * as inventoryApi from '../../services/inventory/inventory.api'
 import { fetchLessorOptions } from '../../services/vehicles/vehicles.api'
 import { toUserMessage } from '../../utils/errorMessage'
 import EmptyState from '../../components/common/EmptyState.vue'
 
-const statsLoading = ref(true)
-const statsError = ref(null)
-const stats = ref([])
+const showStats = ref(true)
 
-const lessorOptions = ref([{ title: 'All Lessors', value: null }])
+const lessorOptions = ref([{ title: 'All', value: null }])
 const lessorFilter = ref(null) // null = all lessors
 const search = ref('')
 let searchDebounce
 
-const modelInventoryLoading = ref(true)
-const modelInventoryError = ref(null)
-const modelInventoryRows = ref([])
-const modelInventoryTotal = ref(0)
+const loading = ref(true)
+const error = ref(null)
+const rows = ref([])
+const totalVehicles = ref(0)
 
-// "Asset Under Management" rolls up every status a vehicle can be in while
-// still part of the active fleet — everything up to (but not including)
-// Returned/Sold/Scrapped, matching VehicleStatusBadge.vue's numeric enum
-// (0 Available … 5 Water Wash) — so it's the one stat card that maps to a
-// *set* of vehicle statuses rather than a single one, and needs its own
-// hardcoded list here rather than the per-stat `status` field the other
-// cards (Available, Booked, Under Service, ...) use below.
-const ASSET_UNDER_MANAGEMENT_STATUSES = [0, 1, 2, 3, 4, 5]
-
-// A-109's per-stat `status` field (docs/api-reference.md) — ASSUMPTION:
-// the same numeric enum VehicleStatusBadge.vue already documents for the
-// vehicles list, since both describe the same vehicle-status domain;
-// not independently confirmed for this specific endpoint. The `Total`
-// entry has no single status, so it (and anything else without one)
-// simply isn't linked.
-function statLink(stat) {
-  if (stat.label === 'Asset Under Management') {
-    return { name: 'vehicles', query: { statuses: ASSET_UNDER_MANAGEMENT_STATUSES.join(',') } }
-  }
-  if (stat.status !== undefined && stat.status !== null) {
-    return { name: 'vehicles', query: { statuses: String(stat.status) } }
-  }
-  return null
+function sum(field) {
+  return rows.value.reduce((acc, row) => acc + (Number(row[field]) || 0), 0)
 }
 
-async function loadStats() {
-  statsLoading.value = true
-  statsError.value = null
-  try {
-    stats.value = await inventoryApi.fetchInventoryStats()
-  } catch (error) {
-    statsError.value = error
-  } finally {
-    statsLoading.value = false
-  }
+// Port of the old app's `stockCount.vue` stat strip: every card is derived
+// from the A-108 rows (so it follows the lessor/search filter), *not* from
+// the fleet-wide A-109 stats the Home page shows. `count` in the A-108
+// response is the total vehicle count for the current filter. `statuses`
+// uses VehicleStatusBadge.vue's numeric vehicle-status enum.
+//
+// Deviations from the old app (deliberate fixes):
+// - "Total" links to the vehicles list with no status filter (the old app
+//   sent `statuses=0`, i.e. Available only).
+// - "Servicing" counts under service + ongoing service + water wash, so the
+//   number matches the 2,4,5 status set it links to (the old app counted
+//   `underService` only).
+const stats = computed(() => [
+  { label: 'Total', count: totalVehicles.value, statuses: [] },
+  { label: 'Available', count: sum('available'), statuses: [0] },
+  { label: 'Booked', count: sum('booked'), statuses: [1] },
+  {
+    label: 'Servicing',
+    count: sum('underService') + sum('ongoingService') + sum('waterWash'),
+    statuses: [2, 4, 5],
+  },
+  { label: 'Returned', count: sum('returned'), statuses: [6] },
+  { label: 'Sold', count: sum('sold'), statuses: [7] },
+  { label: 'Not Working', count: sum('notWorking'), statuses: [3] },
+  { label: 'Scrapped', count: sum('scrapped'), statuses: [8] },
+])
+
+function statLink(stat) {
+  const query = {}
+  if (stat.statuses.length) query.statuses = stat.statuses.join(',')
+  if (lessorFilter.value !== null) query.lessors = String(lessorFilter.value)
+  return { name: 'vehicles', query }
 }
 
 async function loadModelInventory() {
-  modelInventoryLoading.value = true
-  modelInventoryError.value = null
+  loading.value = true
+  error.value = null
   try {
     const result = await inventoryApi.fetchModelInventory({
       lessor: lessorFilter.value,
       searchQuery: search.value,
     })
-    modelInventoryRows.value = result.rows
-    modelInventoryTotal.value = result.total
-  } catch (error) {
-    modelInventoryError.value = error
+    rows.value = result.rows
+    totalVehicles.value = result.total
+  } catch (err) {
+    error.value = err
   } finally {
-    modelInventoryLoading.value = false
+    loading.value = false
   }
 }
 
-function onLessorFilterChange() {
-  loadModelInventory()
-}
-
 function onSearchInput(value) {
-  search.value = value
+  search.value = value ?? ''
   clearTimeout(searchDebounce)
   searchDebounce = setTimeout(loadModelInventory, 350)
 }
 
 async function loadLessorOptions() {
   try {
-    lessorOptions.value = [{ title: 'All Lessors', value: null }, ...(await fetchLessorOptions())]
+    lessorOptions.value = [{ title: 'All', value: null }, ...(await fetchLessorOptions())]
   } catch {
     // Non-critical — the lessor filter just falls back to "All" only.
   }
 }
 
 onMounted(() => {
-  loadStats()
   loadModelInventory()
   loadLessorOptions()
 })
@@ -100,43 +94,40 @@ onMounted(() => {
 
 <template>
   <div>
-    <h2 class="text-h5 font-weight-medium mb-3">Inventory</h2>
+    <div class="d-flex align-center justify-space-between mb-3">
+      <h2 class="text-h5 font-weight-medium">Inventory</h2>
+      <v-btn
+        :icon="showStats ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+        variant="text"
+        color="primary"
+        density="comfortable"
+        :aria-label="showStats ? 'Hide stats' : 'Show stats'"
+        @click="showStats = !showStats"
+      />
+    </div>
 
-    <!-- Fleet inventory stat strip (A-109) -->
-    <div v-if="statsLoading" class="d-flex ga-3 mb-6" style="overflow-x: auto">
-      <v-skeleton-loader v-for="n in 6" :key="n" type="card" width="160" height="90" />
-    </div>
-    <EmptyState
-      v-else-if="statsError"
-      icon="mdi-alert-circle-outline"
-      title="Couldn't load fleet stats"
-      :message="toUserMessage(statsError)"
-      class="mb-6"
-    >
-      <v-btn class="mt-2" variant="tonal" color="primary" @click="loadStats">Retry</v-btn>
-    </EmptyState>
-    <div v-else class="d-flex ga-3 mb-6 pb-1" style="overflow-x: auto">
-      <v-card
-        v-for="stat in stats"
-        :key="stat.label"
-        variant="outlined"
-        rounded="lg"
-        class="pa-4 flex-shrink-0"
-        style="min-width: 160px"
-        :to="statLink(stat)"
-        :link="Boolean(statLink(stat))"
-      >
-        <div class="d-flex align-baseline ga-2">
-          <span class="text-h5 font-weight-bold">{{ stat.count }}</span>
-          <span v-if="stat.percentage !== undefined" class="text-caption text-success">
-            {{ stat.percentage }}%
-          </span>
+    <!-- Stat strip, derived from the A-108 rows below -->
+    <v-expand-transition>
+      <div v-if="showStats">
+        <div v-if="loading && rows.length === 0" class="d-flex ga-3 mb-4" style="overflow-x: auto">
+          <v-skeleton-loader v-for="n in 6" :key="n" type="card" width="150" height="100" />
         </div>
-        <div class="text-caption font-weight-medium text-medium-emphasis text-no-wrap">
-          {{ stat.label }}
+        <div v-else-if="!error" class="d-flex ga-3 mb-4 pb-1" style="overflow-x: auto">
+          <v-card
+            v-for="stat in stats"
+            :key="stat.label"
+            variant="outlined"
+            rounded="lg"
+            class="pa-4 flex-shrink-0 text-center"
+            style="min-width: 150px"
+            :to="statLink(stat)"
+          >
+            <div class="text-h5 font-weight-bold">{{ stat.count }}</div>
+            <div class="text-body-2 text-medium-emphasis text-no-wrap">{{ stat.label }}</div>
+          </v-card>
         </div>
-      </v-card>
-    </div>
+      </div>
+    </v-expand-transition>
 
     <!-- Lessor filter + model search (A-108) -->
     <div class="d-flex align-center flex-wrap ga-3 mb-3">
@@ -147,12 +138,13 @@ onMounted(() => {
         variant="outlined"
         hide-details
         rounded="lg"
-        style="max-width: 220px"
-        @update:model-value="onLessorFilterChange"
+        style="max-width: 260px"
+        @update:model-value="loadModelInventory"
       />
       <v-text-field
         :model-value="search"
         placeholder="Search model here"
+        prepend-inner-icon="mdi-magnify"
         density="compact"
         variant="outlined"
         hide-details
@@ -164,61 +156,71 @@ onMounted(() => {
       />
     </div>
 
-    <div class="text-body-2 text-medium-emphasis mb-3">{{ modelInventoryTotal }} Models Found</div>
+    <div class="text-body-2 text-medium-emphasis mb-3">{{ rows.length }} Models Found</div>
 
-    <div v-if="modelInventoryLoading" class="d-flex flex-column ga-2">
+    <div v-if="loading && rows.length === 0" class="d-flex flex-column ga-2">
       <v-skeleton-loader v-for="n in 3" :key="n" type="table-row" />
     </div>
     <EmptyState
-      v-else-if="modelInventoryError"
+      v-else-if="error"
       icon="mdi-alert-circle-outline"
       title="Couldn't load model inventory"
-      :message="toUserMessage(modelInventoryError)"
+      :message="toUserMessage(error)"
     >
       <v-btn class="mt-2" variant="tonal" color="primary" @click="loadModelInventory">Retry</v-btn>
     </EmptyState>
-    <EmptyState
-      v-else-if="modelInventoryRows.length === 0"
-      icon="mdi-motorbike"
-      title="No models found"
-    />
-    <v-table v-else fixed-header>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Available</th>
-          <th>Booked</th>
-          <th>Under Service</th>
-          <th>Not Working</th>
-          <th>Ongoing Service</th>
-          <th>Water Wash</th>
-          <th>Returned</th>
-          <th>Sold</th>
-          <th>Scrapped</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="row in modelInventoryRows" :key="row.id">
-          <td>
-            <div class="d-flex align-center ga-2 py-2">
-              <v-avatar size="28" rounded="lg" color="grey-lighten-3">
-                <v-img v-if="row.image" :src="row.image" cover />
-                <v-icon v-else icon="mdi-motorbike" size="16" color="grey" />
-              </v-avatar>
-              <span>{{ row.name ?? '—' }}</span>
-            </div>
-          </td>
-          <td>{{ row.available }}</td>
-          <td>{{ row.booked }}</td>
-          <td>{{ row.underService }}</td>
-          <td>{{ row.notWorking }}</td>
-          <td>{{ row.ongoingService }}</td>
-          <td>{{ row.waterWash }}</td>
-          <td>{{ row.returned }}</td>
-          <td>{{ row.sold }}</td>
-          <td>{{ row.scrapped }}</td>
-        </tr>
-      </tbody>
-    </v-table>
+    <EmptyState v-else-if="rows.length === 0" icon="mdi-motorbike" title="No models found" />
+    <v-card v-else>
+      <v-table fixed-header class="inventory-table text-no-wrap" :class="{ 'opacity-60': loading }">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Available</th>
+            <th>Booked</th>
+            <th>Under Service</th>
+            <th>Not Working</th>
+            <th>Ongoing Service</th>
+            <th>Water Wash</th>
+            <th>Returned</th>
+            <th>Sold</th>
+            <th>Scrapped</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in rows" :key="row.id">
+            <td>
+              <div class="d-flex align-center ga-3 py-2">
+                <v-img
+                  v-if="row.image"
+                  :src="row.image"
+                  width="48"
+                  height="32"
+                  class="flex-grow-0"
+                />
+                <v-icon v-else icon="mdi-motorbike" color="grey" />
+                <span class="text-truncate" style="max-width: 160px" :title="row.name">
+                  {{ row.name ?? '—' }}
+                </span>
+              </div>
+            </td>
+            <td>{{ row.available }}</td>
+            <td>{{ row.booked }}</td>
+            <td>{{ row.underService }}</td>
+            <td>{{ row.notWorking }}</td>
+            <td>{{ row.ongoingService }}</td>
+            <td>{{ row.waterWash }}</td>
+            <td>{{ row.returned }}</td>
+            <td>{{ row.sold }}</td>
+            <td>{{ row.scrapped }}</td>
+          </tr>
+        </tbody>
+      </v-table>
+    </v-card>
   </div>
 </template>
+
+<style scoped>
+.inventory-table tbody tr:nth-child(odd) {
+  background: rgba(var(--v-theme-on-surface), 0.04);
+}
+</style>
