@@ -70,7 +70,14 @@ const ASSET_UNDER_MANAGEMENT_STATUSES = [0, 1, 2, 3, 4, 5]
 // not independently confirmed for this specific endpoint. The `Total`
 // entry has no single status, so it (and anything else without one)
 // simply isn't linked.
+// A-109's document-expiry entries (confirmed `filter_tag` values) open the
+// matching tab on the Expiry Reminder page, like the old app's Home page.
+const EXPIRY_FILTER_TAGS = ['rc_expiry', 'insurance_expiry', 'permit_expiry', 'pucc_expiry']
+
 function statLink(stat) {
+  if (EXPIRY_FILTER_TAGS.includes(stat.filter_tag)) {
+    return { name: 'vehicle-reminders', query: { current_tab: stat.filter_tag } }
+  }
   if (stat.label === 'Asset Under Management') {
     return { name: 'vehicles', query: { statuses: ASSET_UNDER_MANAGEMENT_STATUSES.join(',') } }
   }

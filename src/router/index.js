@@ -124,7 +124,7 @@ const routes = [
     path: '/vehicles/reminders',
     name: 'vehicle-reminders',
     component: () => import('../pages/vehicles/RemindersPage.vue'),
-    meta: { layout: 'app', requiresAuth: true, title: 'Reminders' },
+    meta: { layout: 'app', requiresAuth: true, title: 'Expiry Reminder' },
   },
   {
     // The old app used the singular `/vehicle/track/gps` — normalized
@@ -154,6 +154,12 @@ const routes = [
     name: 'stock-count',
     component: () => import('../pages/inventory/StockCountPage.vue'),
     meta: { layout: 'app', requiresAuth: true, title: 'Inventory' },
+  },
+  {
+    path: '/recovery',
+    name: 'recovery',
+    component: () => import('../pages/recovery/RecoveryPage.vue'),
+    meta: { layout: 'app', requiresAuth: true, title: 'Recovery List' },
   },
   {
     path: '/:pathMatch(.*)*',

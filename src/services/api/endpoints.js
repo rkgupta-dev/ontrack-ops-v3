@@ -85,6 +85,17 @@ export const ENDPOINTS = {
   // A-139 / A-140 — POST — recovery list membership
   BOOKING_ADD_TO_RECOVERY: (id) => `/operations/bookings/${id}/add-to-recovery`,
   BOOKING_REMOVE_FROM_RECOVERY: (id) => `/operations/bookings/${id}/remove-from-recovery`,
+  // A-136 — GET — recovery list (bare array response, embeds bookingData
+  // (+ customerData) and vehicleData (+ modelData)), confirmed live 2026-09-23
+  RECOVERY_LIST: '/operations/recovery-list',
+  // A-137 — GET — comments on one recovery record
+  RECOVERY_COMMENTS: (id) => `/operations/recovery-list/${id}/comments`,
+  // A-138 — POST — add a comment to a recovery record
+  RECOVERY_ADD_COMMENT: '/operations/recovery-list/comment',
+  // A-135 — POST — mark a recovery as recovered. Despite the `bookings/:id`
+  // path, the old app passes the *recovery record's* id here, not the
+  // booking's — ported as-is.
+  RECOVERY_CLOSE: (id) => `/operations/bookings/${id}/close-from-recovery`,
   // A-130 — POST — reconcile a manually-confirmed Razorpay payment
   BOOKING_UPDATE_PAYMENT: 'operations/razorpay/payment/update',
   // A-148 — PUT — adjust a customer's outstanding penalty for a booking

@@ -89,6 +89,36 @@ export function formatFullDate(value, fallback = '—') {
   return `${month} ${day}${ordinalSuffix(day)} ${year}, ${time}`
 }
 
+// Fixed English names — `toLocaleDateString` gives "Sept" in some locales.
+const SHORT_MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
+
+/**
+ * "19th Sep 2026" — ordinal day + short month, no time (recovery list).
+ * Plain `YYYY-MM-DD` strings are read as a local calendar date so they
+ * don't shift a day in timezones behind UTC.
+ */
+export function formatOrdinalDate(value, fallback = '—') {
+  if (!value) return fallback
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  const date = match ? new Date(+match[1], +match[2] - 1, +match[3]) : new Date(value)
+  if (Number.isNaN(date.getTime())) return fallback
+  const day = date.getDate()
+  return `${day}${ordinalSuffix(day)} ${SHORT_MONTHS[date.getMonth()]} ${date.getFullYear()}`
+}
+
 /** "Jul 29, 2024" — short calendar date, no time (profile DOB/agent-since). */
 export function formatDateOnly(value, fallback = '—') {
   if (!value) return fallback

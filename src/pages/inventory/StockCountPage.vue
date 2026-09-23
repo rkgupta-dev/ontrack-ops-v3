@@ -174,16 +174,16 @@ onMounted(() => {
       <v-table fixed-header class="inventory-table text-no-wrap" :class="{ 'opacity-60': loading }">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Available</th>
-            <th>Booked</th>
-            <th>Under Service</th>
-            <th>Not Working</th>
-            <th>Ongoing Service</th>
-            <th>Water Wash</th>
-            <th>Returned</th>
-            <th>Sold</th>
-            <th>Scrapped</th>
+            <th class="font-weight-bold">Name</th>
+            <th class="font-weight-bold">Available</th>
+            <th class="font-weight-bold">Booked</th>
+            <th class="font-weight-bold">Under Service</th>
+            <th class="font-weight-bold">Not Working</th>
+            <th class="font-weight-bold">Ongoing Service</th>
+            <th class="font-weight-bold">Water Wash</th>
+            <th class="font-weight-bold">Returned</th>
+            <th class="font-weight-bold">Sold</th>
+            <th class="font-weight-bold">Scrapped</th>
           </tr>
         </thead>
         <tbody>

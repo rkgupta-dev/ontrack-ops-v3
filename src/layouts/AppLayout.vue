@@ -25,13 +25,15 @@ const navItems = [
   { to: { name: 'bookings' }, icon: 'mdi-calendar', label: 'Bookings' },
   { to: { name: 'customers' }, icon: 'mdi-account-group-outline', label: 'Customers' },
   { to: { name: 'stock-count' }, icon: 'mdi-warehouse', label: 'Inventory' },
+  { to: { name: 'vehicle-reminders' }, icon: 'mdi-bell-alert-outline', label: 'Expiry Reminder' },
+  { to: { name: 'recovery' }, icon: 'mdi-tow-truck', label: 'Recovery' },
 ]
 
 // The floating mobile bar / desktop bottom bar only have room for the four
 // primary sections; everything else (Attendance, Inventory, ...) lives
 // behind the "More" icon (mobile) or the left rail only (desktop).
 const bottomNavItems = navItems.filter(
-  (item) => !['attendance', 'stock-count'].includes(item.to.name),
+  (item) => !['attendance', 'stock-count', 'vehicle-reminders', 'recovery'].includes(item.to.name),
 )
 
 const userDisplayName = computed(
@@ -402,9 +404,16 @@ function handleLogout() {
   gap: 8px;
   padding: 10px 20px;
   border-radius: 16px 16px 0 0;
-  background: rgb(var(--v-theme-surface));
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  /* Frosted glass background */
+  background: rgba(var(--v-theme-surface), 0.65);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+
+  /* Soft border & shadow to enhance glass depth */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: none;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .desktop-bottom-bar__btn {

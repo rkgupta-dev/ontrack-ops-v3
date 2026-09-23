@@ -5,6 +5,7 @@ import {
   addDaysIso,
   toPaymentReceivedOn,
   isExpired,
+  formatOrdinalDate,
 } from '../../src/utils/date'
 
 describe('isExpired', () => {
@@ -96,5 +97,20 @@ describe('formatRelativeTime', () => {
   it('returns the fallback for missing/invalid input', () => {
     expect(formatRelativeTime(null)).toBe('—')
     expect(formatRelativeTime('not-a-date')).toBe('—')
+  })
+})
+
+describe('formatOrdinalDate', () => {
+  it('renders ordinal day + short month + year for a plain date', () => {
+    expect(formatOrdinalDate('2026-09-19')).toBe('19th Sep 2026')
+    expect(formatOrdinalDate('2026-09-01')).toBe('1st Sep 2026')
+    expect(formatOrdinalDate('2026-09-22')).toBe('22nd Sep 2026')
+    expect(formatOrdinalDate('2026-09-23')).toBe('23rd Sep 2026')
+    expect(formatOrdinalDate('2026-09-11')).toBe('11th Sep 2026')
+  })
+
+  it('returns the fallback for missing/invalid input', () => {
+    expect(formatOrdinalDate(null)).toBe('—')
+    expect(formatOrdinalDate('not-a-date')).toBe('—')
   })
 })
