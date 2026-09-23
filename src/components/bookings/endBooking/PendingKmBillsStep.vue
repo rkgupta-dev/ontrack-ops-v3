@@ -115,6 +115,8 @@ async function createBill() {
       <v-btn
         :color="canProceed ? 'success' : undefined"
         :disabled="!canProceed"
+        variant="flat"
+        rounded="lg"
         @click="emit('next')"
       >
         Next

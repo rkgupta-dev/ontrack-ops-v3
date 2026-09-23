@@ -17,6 +17,7 @@ import ServiceHistoryTab from '../../components/vehicles/detail/ServiceHistoryTa
 import VcrTab from '../../components/vehicles/detail/VcrTab.vue'
 import ActivitiesTab from '../../components/bookings/detail/ActivitiesTab.vue'
 import VehicleCollectionTab from '../../components/vehicles/detail/VehicleCollectionTab.vue'
+import VehicleLiveLocation from '../../components/vehicles/detail/VehicleLiveLocation.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -125,19 +126,19 @@ async function submitResale() {
           </v-chip>
           <v-chip
             v-if="isExpired(vehicle.nextInsuranceDate)"
-            size="small"
+            size="x-small"
             color="error"
             variant="tonal"
           >
             Insurance Expired
           </v-chip>
-          <v-chip v-if="isExpired(vehicle.RCExpiry)" size="small" color="error" variant="tonal">
+          <v-chip v-if="isExpired(vehicle.RCExpiry)" size="x-small" color="error" variant="tonal">
             RC Expired
           </v-chip>
           <VehicleStatusBadge :status="vehicle.status" />
           <v-chip
             v-if="vehicle.subStatus && vehicle.subStatus !== 'Default'"
-            size="small"
+            size="x-small"
             :color="vehicle.subStatus === 'Engine Issue Resolved' ? 'primary' : 'error'"
             variant="tonal"
           >
@@ -150,7 +151,7 @@ async function submitResale() {
             />
             {{ vehicle.subStatus }}
           </v-chip>
-          <v-chip v-if="isSwapKeyBlocked" size="small" color="error" variant="tonal">
+          <v-chip v-if="isSwapKeyBlocked" size="x-small" color="error" variant="tonal">
             <v-icon icon="mdi-key" size="14" start /> Swap Key Blocked
           </v-chip>
         </div>
@@ -202,6 +203,10 @@ async function submitResale() {
             <strong class="ml-2">{{ formatCurrency(vehicle.modelData?.price) }} /m</strong>
           </div>
         </div>
+      </v-col>
+      <!-- Live GPS position (A-072) -->
+      <v-col cols="12" md="5">
+        <VehicleLiveLocation :registration-number="vehicle.registrationNumber" />
       </v-col>
     </v-row>
 

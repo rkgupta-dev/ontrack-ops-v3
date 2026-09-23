@@ -569,7 +569,7 @@ const deliveryDialog = ref(false)
               </a>
             </v-col>
           </v-row>
-          <v-alert type="warning" variant="tonal" density="compact" class="mt-3">
+          <v-alert :icon="false" type="warning" variant="tonal" density="compact" class="mt-3">
             Some documents may not be visible due to different formats. Click any image to view in
             full size.
           </v-alert>

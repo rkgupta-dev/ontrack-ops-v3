@@ -7,6 +7,28 @@ export async function fetchVehicleDetail(vehicleId) {
   return response.data ?? null
 }
 
+/**
+ * A-072 — GET /operations/vehicle/current-location?registrationNumber=
+ *
+ * Live GPS position, polled by VehicleLiveLocation.vue, so it opts out of
+ * the global top-of-page loading bar. Response — CONFIRMED live 2026-09-23:
+ * `{ data: [ { vehicleNumber, vehicleId, lat, lng, movementStatus
+ * ("STOPPED", ...), speed (nullable), ignition ("ON"/"OFF"), orientation,
+ * lastUpdated (nullable), batteryValue, batteryUnit, totalSatellites } ] }`.
+ * An empty `data` means the vehicle has no tracking; returns null then.
+ */
+export async function fetchCurrentLocation(registrationNumber) {
+  const response = await v2Client.get(ENDPOINTS.VEHICLE_CURRENT_LOCATION, {
+    params: { registrationNumber },
+    skipGlobalLoading: true,
+  })
+  const row = Array.isArray(response.data?.data) ? response.data.data[0] : null
+  const lat = Number(row?.lat)
+  const lng = Number(row?.lng)
+  if (!row || !Number.isFinite(lat) || !Number.isFinite(lng)) return null
+  return { ...row, lat, lng }
+}
+
 /** A-169 — service history. Response: `{ rows }`. */
 export async function fetchServiceHistory(vehicleId) {
   const response = await v2Client.get(ENDPOINTS.VEHICLE_SERVICE_HISTORY(vehicleId))

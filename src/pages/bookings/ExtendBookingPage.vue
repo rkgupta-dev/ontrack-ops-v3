@@ -199,7 +199,15 @@ async function createOrder() {
               ><span>{{ formatCurrency(extendResponse.totalAmount) }}</span>
             </div>
 
-            <v-btn block color="primary" class="mt-4" :loading="creatingOrder" @click="createOrder">
+            <v-btn
+              block
+              variant="flat"
+              rounded="lg"
+              color="primary"
+              class="mt-4"
+              :loading="creatingOrder"
+              @click="createOrder"
+            >
               Create Order
             </v-btn>
           </v-card>

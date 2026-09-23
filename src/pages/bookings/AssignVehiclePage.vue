@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import * as bookingDetailApi from '../../services/bookings/bookingDetail.api'
 import * as assignApi from '../../services/bookings/assignVehicle.api'
 import { toUserMessage } from '../../utils/errorMessage'
-import { todayIsoDate, addDaysIso } from '../../utils/date'
+import { todayIsoDate, addDaysIso, formatDateOnly } from '../../utils/date'
 import EmptyState from '../../components/common/EmptyState.vue'
 
 const route = useRoute()
@@ -135,6 +135,32 @@ const assigning = ref(false)
 const assignMessage = ref(null)
 const assignError = ref(null)
 const showSuccessPrompt = ref(false)
+// Set once the pre-booking data (images/KM/address) is saved, so "Try
+// again" after a failed assignment doesn't upload it a second time.
+const preDataSubmitted = ref(false)
+
+// One explicit dialog state instead of inferring it from message/error
+// combinations: 'confirm' → 'working' → 'success' | 'error'.
+const dialogState = computed(() => {
+  if (showSuccessPrompt.value) return 'success'
+  if (assignError.value) return 'error'
+  if (assigning.value) return 'working'
+  return 'confirm'
+})
+
+const assignSummary = computed(() => [
+  {
+    label: 'Vehicle',
+    value: vehicleOptions.value.find((o) => o.value === selectedVehicle.value)?.title ?? '—',
+  },
+  {
+    label: 'Model',
+    value: modelOptions.value.find((o) => o.value === selectedModel.value)?.title ?? '—',
+  },
+  { label: 'Start', value: formatDateOnly(startDate.value) },
+  { label: 'End', value: formatDateOnly(endDate.value) },
+  { label: 'KM reading', value: kmReading.value || '—' },
+])
 
 function openConfirm() {
   assignMessage.value = null
@@ -148,12 +174,13 @@ async function confirmAssign() {
   assignMessage.value = 'Getting Ready ...'
   assignError.value = null
   try {
-    if (!hasExistingLineItem.value) {
+    if (!hasExistingLineItem.value && !preDataSubmitted.value) {
       await assignApi.submitPreBookingData(bookingData.value.id, images.value, {
         kmReading: kmReading.value,
         comment: comment.value,
         permanentAddress: permanentAddress.value,
       })
+      preDataSubmitted.value = true
       assignMessage.value = 'Pre Data has been set.'
     }
     await assignApi.assignVehicleToBooking(bookingData.value.id, {
@@ -193,7 +220,9 @@ async function confirmAssign() {
       <v-col cols="12" sm="6">
         <v-select
           v-model="selectedModel"
-          label="Model"
+          placeholder="Model"
+          variant="outlined"
+          rounded="lg"
           :items="modelOptions"
           :disabled="vehiclePreselected"
         />
@@ -201,19 +230,21 @@ async function confirmAssign() {
       <v-col cols="12" sm="6">
         <v-select
           v-model="selectedVehicle"
-          label="Vehicle"
+          placeholder="Vehicle"
+          variant="outlined"
+          rounded="lg"
           :items="vehicleOptions"
           :disabled="vehiclePreselected"
         />
       </v-col>
       <v-col cols="12" sm="4">
-        <v-text-field v-model="kmReading" label="KM Reading" />
+        <v-text-field v-model="kmReading" label="KM Reading" rounded="lg" />
       </v-col>
       <v-col cols="12" sm="4">
-        <v-text-field v-model="startDate" type="date" label="Start Date" />
+        <v-text-field v-model="startDate" type="date" label="Start Date" rounded="lg" />
       </v-col>
       <v-col cols="12" sm="4">
-        <v-text-field v-model="endDate" type="date" label="End Date" />
+        <v-text-field v-model="endDate" type="date" label="End Date" rounded="lg" />
       </v-col>
     </v-row>
 
@@ -236,19 +267,29 @@ async function confirmAssign() {
           accept="image/*"
           density="compact"
           prepend-icon=""
-          prepend-inner-icon="mdi-camera-outline"
+          variant="outlined"
+          rounded="lg"
           :label="previews[field.key] ? 'Replace' : 'Upload'"
           @update:model-value="(f) => onImageChange(field.key, f)"
         />
       </v-col>
     </v-row>
 
-    <v-textarea v-model="permanentAddress" label="Permanent Address" rows="2" class="mt-2" />
-    <v-textarea v-model="comment" label="Comment" rows="2" />
+    <v-textarea
+      v-model="permanentAddress"
+      label="Permanent Address"
+      rows="2"
+      class="mt-2"
+      variant="outlined"
+      rounded="lg"
+    />
+    <v-textarea v-model="comment" label="Comment" rows="2" variant="outlined" rounded="lg" />
 
     <v-btn
       size="large"
       block
+      rounded="lg"
+      variant="flat"
       color="primary"
       :disabled="!validate"
       class="mt-4"
@@ -258,54 +299,107 @@ async function confirmAssign() {
     </v-btn>
 
     <v-dialog v-model="confirmPrompt" max-width="420" persistent>
-      <v-card class="pa-6 text-center">
-        <template v-if="!showSuccessPrompt">
-          <v-icon
-            :icon="assignError ? 'mdi-alert-circle' : assignMessage ? undefined : 'mdi-help-circle'"
-            :color="assignError ? 'error' : 'warning'"
-            size="48"
-            class="mb-4"
-          />
-          <v-progress-circular
-            v-if="assignMessage && !assignError"
-            indeterminate
-            color="primary"
-            size="48"
-            class="mb-4"
-          />
-          <h3 v-if="!assignMessage" class="text-h6 font-weight-bold mb-2">Are you sure?</h3>
-          <h3 v-else class="text-h6 mb-2" :class="assignError ? 'text-error' : ''">
-            {{ assignError ?? assignMessage }}
-          </h3>
-          <p v-if="!assignMessage && !assignError" class="text-medium-emphasis mb-4">
-            Do you want to proceed with assigning this booking?
-          </p>
-          <div class="d-flex justify-center ga-2 mt-4">
-            <v-btn
-              v-if="!assignMessage || assignError"
-              variant="outlined"
-              @click="confirmPrompt = false"
+      <v-card class="pa-6">
+        <!-- Confirm -->
+        <template v-if="dialogState === 'confirm'">
+          <div class="text-center mb-4">
+            <v-avatar color="primary" variant="tonal" size="56" class="mb-3">
+              <v-icon icon="mdi-motorbike" size="28" />
+            </v-avatar>
+            <h3 class="text-h6 font-weight-bold">Assign this vehicle?</h3>
+            <div class="text-body-2 text-medium-emphasis">
+              Booking <strong>{{ bookingId }}</strong>
+            </div>
+          </div>
+          <v-sheet rounded="lg" color="grey-lighten-4" class="pa-3 mb-5">
+            <div
+              v-for="row in assignSummary"
+              :key="row.label"
+              class="d-flex justify-space-between text-body-2 py-1"
             >
+              <span class="text-medium-emphasis">{{ row.label }}</span>
+              <span class="font-weight-medium">{{ row.value }}</span>
+            </div>
+          </v-sheet>
+          <div class="d-flex ga-2">
+            <v-btn class="flex-1-1" variant="outlined" rounded="lg" @click="confirmPrompt = false">
               Cancel
             </v-btn>
             <v-btn
+              class="flex-1-1"
               color="primary"
-              :loading="assigning"
-              :disabled="assignMessage != null && !assignError"
+              variant="flat"
+              rounded="lg"
               @click="confirmAssign"
             >
-              Confirm
+              Assign
             </v-btn>
           </div>
         </template>
 
+        <!-- Working -->
+        <div v-else-if="dialogState === 'working'" class="text-center py-4">
+          <v-progress-circular indeterminate color="primary" size="56" width="5" class="mb-4" />
+          <h3 class="text-h6 font-weight-bold mb-1">Assigning vehicle…</h3>
+          <div class="text-body-2 text-medium-emphasis">{{ assignMessage }}</div>
+          <div class="text-caption text-medium-emphasis mt-2">Please don't close this page.</div>
+        </div>
+
+        <!-- Error -->
+        <template v-else-if="dialogState === 'error'">
+          <div class="text-center mb-5">
+            <v-avatar color="error" variant="tonal" size="56" class="mb-3">
+              <v-icon icon="mdi-alert-circle-outline" size="28" />
+            </v-avatar>
+            <h3 class="text-h6 font-weight-bold mb-1">Couldn't assign the vehicle</h3>
+            <div class="text-body-2 text-medium-emphasis">{{ assignError }}</div>
+          </div>
+          <div class="d-flex ga-2">
+            <v-btn class="flex-1-1" variant="outlined" rounded="lg" @click="confirmPrompt = false">
+              Close
+            </v-btn>
+            <v-btn
+              class="flex-1-1"
+              color="primary"
+              variant="flat"
+              rounded="lg"
+              @click="confirmAssign"
+            >
+              Try again
+            </v-btn>
+          </div>
+        </template>
+
+        <!-- Success -->
         <template v-else>
-          <v-icon icon="mdi-check-circle" color="success" size="48" class="mb-4" />
-          <h3 class="text-h6 font-weight-bold mb-2">Booking Assigned!</h3>
-          <p class="text-medium-emphasis mb-4">You have successfully assigned this booking.</p>
-          <v-btn color="success" rounded="pill" @click="router.push({ name: 'home' })">
-            Back to List
-          </v-btn>
+          <div class="text-center mb-5">
+            <v-avatar color="success" variant="tonal" size="56" class="mb-3">
+              <v-icon icon="mdi-check-circle-outline" size="28" />
+            </v-avatar>
+            <h3 class="text-h6 font-weight-bold mb-1">Vehicle assigned</h3>
+            <div class="text-body-2 text-medium-emphasis">
+              {{ assignSummary[0].value }} is now assigned to booking {{ bookingId }}.
+            </div>
+          </div>
+          <div class="d-flex ga-2">
+            <v-btn
+              class="flex-1-1"
+              variant="outlined"
+              rounded="lg"
+              @click="router.push({ name: 'home' })"
+            >
+              Back to List
+            </v-btn>
+            <v-btn
+              class="flex-1-1"
+              color="primary"
+              variant="flat"
+              rounded="lg"
+              @click="router.push({ name: 'booking-detail', params: { bookingId } })"
+            >
+              View Booking
+            </v-btn>
+          </div>
         </template>
       </v-card>
     </v-dialog>

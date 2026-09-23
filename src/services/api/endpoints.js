@@ -242,6 +242,8 @@ export const ENDPOINTS = {
   VEHICLE_SWAP_KEY_UNBLOCK: (swapKeyId) => `/admin/swap-key/${swapKeyId}/unblock`,
   // Vehicle Condition Report — GET services/qcheck?vehicleId=:id
   VEHICLE_VCR: 'services/qcheck',
+  // A-072 — GET — live GPS position for one vehicle, query: registrationNumber
+  VEHICLE_CURRENT_LOCATION: '/operations/vehicle/current-location',
   // A-074 — GET — GPS vendor list, for the GPS-status toggle's vendor picker
   VEHICLE_GPS_VENDORS: 'gps/vendor',
   // A-159 — GET — vehicles with an expired RC/insurance/permit/PUCC

@@ -706,10 +706,10 @@ Functions that fire more than one request. Each of these is a sequential round t
 #### `A-072` — `GET /operations/vehicle/current-location`
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
-- **Purpose:** Fetches current-location — called from fetchLocation()
+- **Purpose:** Live GPS position of one vehicle, polled for the vehicle detail map — called from fetchLocation()
 - **Request:** query: registrationNumber
-- **Response read by frontend:** (not read, or read indirectly)
-- **Used in:** `components/vehicles/gpsTracker.vue`
+- **Response — CONFIRMED against the live backend 2026-09-23** (`KA01AU4527`): `{ data: [ { vehicleNumber, vehicleId, lat, lng, movementStatus ("STOPPED", ...), speed (nullable), ignition ("ON"/"OFF"), orientation, lastUpdated (nullable), batteryValue, batteryUnit, totalSatellites } ] }`. Empty `data` = no tracking. The old app also read `speed_unit`, which is not in the response.
+- **Used in:** `components/vehicles/gpsTracker.vue`; also `ontrack-ops-v3` (`src/services/vehicles/vehicleDetail.api.js`, `src/components/vehicles/detail/VehicleLiveLocation.vue`)
 
 #### `A-073` — `POST /toggleGpsStatus/vehicle/:id`
 

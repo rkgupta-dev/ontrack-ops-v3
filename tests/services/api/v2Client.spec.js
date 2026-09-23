@@ -85,4 +85,34 @@ describe('v2Client', () => {
 
     expect(ui.loading).toBe(false)
   })
+
+  // Regression: a client-wide `Content-Type: application/json` default made
+  // axios serialize FormData to JSON, silently dropping every file upload.
+  async function capturedRequest(data) {
+    let captured
+    await v2Client.post('/echo', data, {
+      adapter: async (config) => {
+        captured = config
+        return { data: {}, status: 200, statusText: 'OK', headers: {}, config }
+      },
+    })
+    return captured
+  }
+
+  it('sends FormData as-is (multipart), not serialized to JSON', async () => {
+    const fd = new FormData()
+    fd.append('image1', new Blob(['x'], { type: 'image/png' }), 'a.png')
+
+    const config = await capturedRequest(fd)
+
+    expect(config.data).toBeInstanceOf(FormData)
+    expect(String(config.headers.getContentType() ?? '')).not.toContain('application/json')
+  })
+
+  it('still sends plain objects as JSON', async () => {
+    const config = await capturedRequest({ a: 1 })
+
+    expect(config.data).toBe('{"a":1}')
+    expect(config.headers.getContentType()).toContain('application/json')
+  })
 })

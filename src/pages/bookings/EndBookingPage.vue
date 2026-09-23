@@ -272,6 +272,7 @@ onMounted(loadBooking)
           type="success"
           variant="tonal"
           class="mb-3"
+          :icon="false"
         >
           A 4-digit 'Drop PIN' has already been generated for this user. Please request the customer
           to share the PIN and use it at the final stage.
@@ -281,12 +282,17 @@ onMounted(loadBooking)
             >
           </div>
         </v-alert>
-        <v-alert v-else type="error" variant="tonal" class="mb-3">
+        <v-alert v-else type="error" variant="tonal" :icon="false" class="mb-3">
           A 4-digit 'Drop PIN' has not yet been generated for this user. Please ask the customer to
           generate the PIN using the provided link and enter it at the final stage.
           <strong class="d-block mt-1">Note: The PIN is required to complete the booking.</strong>
           <div class="mt-2">
-            <v-btn size="small" color="warning" @click="sendLinkToCustomerModal = true"
+            <v-btn
+              rounded="lg"
+              variant="flat"
+              size="small"
+              color="warning"
+              @click="sendLinkToCustomerModal = true"
               >Send Link to Customer</v-btn
             >
           </div>
@@ -306,6 +312,8 @@ onMounted(loadBooking)
         <div class="text-right mt-4">
           <v-btn
             color="success"
+            variant="flat"
+            rounded="lg"
             :disabled="!customerReceivedDropPIN && !absconding"
             @click="currentStage++"
           >
@@ -317,15 +325,22 @@ onMounted(loadBooking)
       <!-- Step 3: post-booking KM + comment -->
       <div v-else-if="currentStage === 3">
         <h3 class="text-h6 mb-4">Enter Post Booking Data</h3>
-        <v-text-field v-model="postKm" label="KM Reading" />
+        <v-text-field v-model="postKm" label="KM Reading" rounded="lg" />
         <v-textarea
           v-model="postBookingComment"
           maxlength="250"
           label="Comment"
+          variant="outlined"
+          rounded="lg"
           placeholder="Describe the condition of the vehicle. Mention any damages or dents."
         />
         <div class="text-right mt-2">
-          <v-btn color="success" :loading="updatingLineItem" @click="updateBookingLineItems"
+          <v-btn
+            variant="flat"
+            rounded="lg"
+            color="success"
+            :loading="updatingLineItem"
+            @click="updateBookingLineItems"
             >Next</v-btn
           >
         </div>

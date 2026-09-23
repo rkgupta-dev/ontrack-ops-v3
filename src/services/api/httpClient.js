@@ -7,11 +7,10 @@ import axios from 'axios'
  * so a future legacy/Basic-auth client can reuse it the same way.
  */
 export function createHttpClient({ baseURL, timeout = 15000 } = {}) {
-  return axios.create({
-    baseURL,
-    timeout,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  // No default Content-Type on purpose: axios picks it per request —
+  // `application/json` for plain objects, `multipart/form-data; boundary=…`
+  // for FormData. Forcing JSON here made axios serialize every FormData
+  // upload to JSON, so the files never reached the backend (multer saw no
+  // multipart body and `request.files` was undefined).
+  return axios.create({ baseURL, timeout })
 }

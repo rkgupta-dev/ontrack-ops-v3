@@ -64,6 +64,8 @@ onMounted(load)
       <div class="text-subtitle-1 font-weight-medium">Pre Booking Images</div>
       <v-btn
         size="small"
+        variant="tonal"
+        rounded="lg"
         color="primary"
         :to="{ name: 'booking-pre-booking-data', params: { bookingId: bookingCode } }"
       >

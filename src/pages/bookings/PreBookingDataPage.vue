@@ -121,13 +121,18 @@ async function submitForm() {
     <v-card class="pa-4 mb-4">
       <v-row>
         <v-col cols="12" md="6">
-          <v-text-field v-model="km" label="KM Reading" />
+          <v-text-field v-model="km" label="KM Reading" hide-details />
         </v-col>
         <v-col cols="6" md="3">
-          <v-text-field :model-value="bookingData.startDate" label="Start Date" readonly />
+          <v-text-field
+            :model-value="bookingData.startDate"
+            label="Start Date"
+            readonly
+            hide-details
+          />
         </v-col>
         <v-col cols="6" md="3">
-          <v-text-field :model-value="bookingData.endDate" label="End Date" readonly />
+          <v-text-field :model-value="bookingData.endDate" label="End Date" readonly hide-details />
         </v-col>
       </v-row>
     </v-card>
@@ -153,9 +158,23 @@ async function submitForm() {
     </v-row>
 
     <v-card class="pa-4 mt-4">
-      <v-textarea v-model="permanentAddress" label="Permanent Address" />
-      <v-textarea v-model="comment" label="Comment" />
-      <v-btn block color="primary" :disabled="!canSubmit" :loading="submitting" @click="submitForm">
+      <v-textarea
+        v-model="permanentAddress"
+        label="Permanent Address"
+        variant="outlined"
+        rounded="lg"
+      />
+      <v-textarea v-model="comment" label="Comment" variant="outlined" rounded="lg" />
+      <v-btn
+        block
+        size="large"
+        color="primary"
+        variant="flat"
+        rounded="lg"
+        :disabled="!canSubmit"
+        :loading="submitting"
+        @click="submitForm"
+      >
         Update
       </v-btn>
     </v-card>

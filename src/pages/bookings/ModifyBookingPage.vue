@@ -301,7 +301,7 @@ async function submitModify() {
 
     <v-row v-if="tab === 'exchange'">
       <v-col cols="6" sm="4">
-        <v-select v-model="model" label="Model *" :items="modelOptions" />
+        <v-select v-model="model" label="Model *" :items="modelOptions" variant="outlined" />
       </v-col>
       <v-col cols="6" sm="4">
         <div class="text-caption text-medium-emphasis mb-1">Vehicle *</div>

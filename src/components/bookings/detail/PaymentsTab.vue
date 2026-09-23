@@ -387,8 +387,15 @@ onMounted(() => load(true))
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="addDialog = false">Cancel</v-btn>
-          <v-btn color="primary" :loading="adding" :disabled="!addFormValid" @click="addCollection">
+          <v-btn variant="text" rounded="lg" @click="addDialog = false">Cancel</v-btn>
+          <v-btn
+            variant="flat"
+            rounded="lg"
+            color="primary"
+            :loading="adding"
+            :disabled="!addFormValid"
+            @click="addCollection"
+          >
             Add Collection
           </v-btn>
         </v-card-actions>
@@ -455,7 +462,7 @@ onMounted(() => load(true))
         <v-card-text>
           <v-row>
             <v-col cols="6">
-              <v-card variant="outlined" class="pa-4">
+              <v-card elevation="0" border class="pa-4">
                 <div class="text-success font-weight-medium mb-2">Credits</div>
                 <div class="d-flex justify-space-between">
                   <span class="text-medium-emphasis">Total Credits:</span>
@@ -464,7 +471,7 @@ onMounted(() => load(true))
               </v-card>
             </v-col>
             <v-col cols="6">
-              <v-card variant="outlined" class="pa-4">
+              <v-card elevation="0" border class="pa-4">
                 <div class="text-error font-weight-medium mb-2">Debits</div>
                 <div class="d-flex justify-space-between">
                   <span class="text-medium-emphasis">Total Debits:</span>
@@ -486,7 +493,7 @@ onMounted(() => load(true))
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="ltvDialog = false">Close</v-btn>
+          <v-btn rounded="lg" variant="text" @click="ltvDialog = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
