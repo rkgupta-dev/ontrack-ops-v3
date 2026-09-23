@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
@@ -9,7 +10,9 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    // Dev-only helper; its bundled vite-plugin-inspect crashes Vitest's
+    // server startup, so leave it out when running tests.
+    !process.env.VITEST && vueDevTools(),
     vuetify({ autoImport: true }),
     VitePWA({
       registerType: 'autoUpdate',

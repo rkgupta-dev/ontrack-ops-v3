@@ -217,7 +217,7 @@ onMounted(() => {
           >
             GPS Tracker
           </v-btn> -->
-          <v-btn color="primary" variant="flat" @click="toggleFilters" rounded="lg">Filters</v-btn>
+          <v-btn color="primary" variant="flat" rounded="lg" @click="toggleFilters">Filters</v-btn>
           <v-menu>
             <template #activator="{ props: menuProps }">
               <v-btn
