@@ -156,6 +156,12 @@ const routes = [
     meta: { layout: 'app', requiresAuth: true, title: 'Inventory' },
   },
   {
+    path: '/models',
+    name: 'models',
+    component: () => import('../pages/models/ModelsPage.vue'),
+    meta: { layout: 'app', requiresAuth: true, title: 'Model List' },
+  },
+  {
     path: '/recovery',
     name: 'recovery',
     component: () => import('../pages/recovery/RecoveryPage.vue'),

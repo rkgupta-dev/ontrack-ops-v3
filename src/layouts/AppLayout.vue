@@ -25,6 +25,7 @@ const navItems = [
   { to: { name: 'bookings' }, icon: 'mdi-calendar', label: 'Bookings' },
   { to: { name: 'customers' }, icon: 'mdi-account-group-outline', label: 'Customers' },
   { to: { name: 'stock-count' }, icon: 'mdi-warehouse', label: 'Inventory' },
+  { to: { name: 'models' }, icon: 'mdi-scooter', label: 'Models' },
   { to: { name: 'vehicle-reminders' }, icon: 'mdi-bell-alert-outline', label: 'Expiry Reminder' },
   { to: { name: 'recovery' }, icon: 'mdi-tow-truck', label: 'Recovery' },
 ]
@@ -33,7 +34,10 @@ const navItems = [
 // primary sections; everything else (Attendance, Inventory, ...) lives
 // behind the "More" icon (mobile) or the left rail only (desktop).
 const bottomNavItems = navItems.filter(
-  (item) => !['attendance', 'stock-count', 'vehicle-reminders', 'recovery'].includes(item.to.name),
+  (item) =>
+    !['attendance', 'stock-count', 'models', 'vehicle-reminders', 'recovery'].includes(
+      item.to.name,
+    ),
 )
 
 const userDisplayName = computed(

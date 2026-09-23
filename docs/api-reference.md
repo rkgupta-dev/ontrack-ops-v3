@@ -1009,10 +1009,10 @@ Functions that fire more than one request. Each of these is a sequential round t
 #### `A-104` — `GET /models/stock`
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
-- **Purpose:** Fetches stock — called from loadModels()
-- **Request:** (none detected)
-- **Response read by frontend:** data (raw)
-- **Used in:** `components/ModelsList.vue`
+- **Purpose:** Per-model stock counts + embedded model record, optionally filtered by location — called from loadModels()
+- **Request:** query: location (optional)
+- **Response — CONFIRMED against the live backend 2026-09-23** (`?location=1`): bare array, one entry per model: `total`, `available`, `booked`, `underService`, `not_working`, `ongoingUnderService`, `underWaterWash`, `returned`, `model` (id), plus embedded `modelData` (`id`, `name`, `image`, `image300`, `price`, `old_price`, `show`, `model_type`, `evType`, ...). Count keys mix snake/camelCase and differ from A-108's naming.
+- **Used in:** `components/ModelsList.vue`; also `ontrack-ops-v3` (`src/services/models/models.api.js`, `src/pages/models/ModelsPage.vue`; `src/services/bookings/assignVehicle.api.js`)
 - **Issues:** no pagination params; raw response.data consumed (no envelope)
 
 #### `A-105` — `POST /operations/create/model`
@@ -1062,10 +1062,10 @@ Functions that fire more than one request. Each of these is a sequential round t
 #### `A-110` — `PUT /operations/models/update/:id`
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
-- **Purpose:** Updates update — called from onSubmit()
+- **Purpose:** Updates a model's show flag, rental price and extension (old) price — called from onSubmit()
 - **Request:** body: old_price, price, show
 - **Response read by frontend:** data (raw), data.error, data.message
-- **Used in:** `components/ModelsList.vue`
+- **Used in:** `components/ModelsList.vue`; also `ontrack-ops-v3` (`src/services/models/models.api.js`, `src/pages/models/ModelsPage.vue`)
 
 #### `A-111` — `GET /operations/vehicle/report/vehicle-count-by-model`
 

@@ -44,6 +44,9 @@ export const ENDPOINTS = {
   // A-108 — GET — per-model inventory breakdown table (old app:
   // components/stockCount.vue). Query: lessor, searchQuery.
   MODEL_INVENTORY: 'operations/models/inventory',
+  // A-110 — PUT — update a model's show flag / price / extension price
+  // (Model List page, old app: components/ModelsList.vue)
+  MODEL_UPDATE: (modelId) => `/operations/models/update/${modelId}`,
   // A-100 — GET — locations list, used here to resolve a location id to a
   // display name for the Home location filter. Response is a bare array.
   LOCATIONS: 'locations',

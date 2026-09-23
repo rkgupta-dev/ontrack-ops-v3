@@ -249,11 +249,11 @@ onMounted(() => fetchPage())
         @update:model-value="refresh"
       >
         <v-btn
-          size="large"
           v-for="opt in STATUS_OPTIONS"
           :key="opt.value"
           :value="opt.value"
           class="text-none"
+          size="large"
         >
           {{ opt.title }}
         </v-btn>
@@ -286,7 +286,7 @@ onMounted(() => fetchPage())
     <div v-if="loading && rows.length === 0" class="d-flex flex-column ga-2">
       <v-skeleton-loader v-for="n in 5" :key="n" type="list-item-two-line" class="rounded-lg" />
     </div>
-    <v-card v-else-if="error" variant="tonal" color="surface-variant" rounded="lg">
+    <v-card v-else-if="error" variant="outlined" rounded="lg">
       <EmptyState
         icon="mdi-alert-circle-outline"
         title="Couldn't load recovery list"
@@ -295,7 +295,7 @@ onMounted(() => fetchPage())
         <v-btn class="mt-2" variant="tonal" color="primary" @click="fetchPage()">Retry</v-btn>
       </EmptyState>
     </v-card>
-    <v-card v-else-if="rows.length === 0" variant="tonal" color="surface-variant" rounded="lg">
+    <v-card v-else-if="rows.length === 0" variant="outlined" rounded="lg">
       <EmptyState
         icon="mdi-check-circle-outline"
         title="No recovery vehicles found"
