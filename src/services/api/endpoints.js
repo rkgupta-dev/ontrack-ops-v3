@@ -44,6 +44,15 @@ export const ENDPOINTS = {
   // A-108 — GET — per-model inventory breakdown table (old app:
   // components/stockCount.vue). Query: lessor, searchQuery.
   MODEL_INVENTORY: 'operations/models/inventory',
+  // --- Inventory Utilisation Report (old app: views/vehicles/stats.vue) ---
+  // A-167 — GET — headline cards
+  VEHICLE_REPORT_SUMMARY: 'operations/vehicle/report/v2',
+  // A-156 — GET — per-model available/booked counts split by vehicle age
+  VEHICLE_REPORT_CHART_DATA: '/operations/vehicle/report/chart-data',
+  // A-111 — GET — per-model in-stock/booked/total counts
+  VEHICLE_REPORT_COUNT_BY_MODEL: '/operations/vehicle/report/vehicle-count-by-model',
+  // A-157 — GET — per-model vehicle counts by age
+  VEHICLE_REPORT_COUNT_BY_AGE: '/operations/vehicle/report/vehicle-count-by-age',
   // A-110 — PUT — update a model's show flag / price / extension price
   // (Model List page, old app: components/ModelsList.vue)
   MODEL_UPDATE: (modelId) => `/operations/models/update/${modelId}`,

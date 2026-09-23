@@ -162,6 +162,13 @@ const routes = [
     meta: { layout: 'app', requiresAuth: true, title: 'Model List' },
   },
   {
+    // Old-app path kept as-is (camelCase and all) so existing bookmarks work.
+    path: '/vehicleStats',
+    name: 'vehicle-stats',
+    component: () => import('../pages/reports/VehicleStatsPage.vue'),
+    meta: { layout: 'app', requiresAuth: true, title: 'Utilisation Report' },
+  },
+  {
     path: '/recovery',
     name: 'recovery',
     component: () => import('../pages/recovery/RecoveryPage.vue'),

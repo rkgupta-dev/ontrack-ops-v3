@@ -61,7 +61,7 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <div class="d-flex align-center justify-space-between flex-wrap ga-3 mb-4">
-      <h1 class="text-h5 font-weight-bold">Customers</h1>
+      <h2 class="text-h5 font-weight-medium">Customers</h2>
       <v-btn
         color="primary"
         variant="flat"

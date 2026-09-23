@@ -1070,10 +1070,10 @@ Functions that fire more than one request. Each of these is a sequential round t
 #### `A-111` — `GET /operations/vehicle/report/vehicle-count-by-model`
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
-- **Purpose:** Fetches vehicle-count-by-model — called from loadVehicleData()
-- **Request:** (none detected)
-- **Response read by frontend:** data (raw)
-- **Used in:** `views/reports/VehicleCountsByModel.vue`
+- **Purpose:** Per-model in-stock/booked/total vehicle counts, optionally per lessor — called from loadVehicleData()
+- **Request:** query: lessor (optional)
+- **Response — CONFIRMED against the live backend 2026-09-23:** object keyed by model name, each `{ inStock, booked, total }` (total = inStock + booked).
+- **Used in:** `views/reports/VehicleCountsByModel.vue`; also `ontrack-ops-v3` (`src/services/reports/vehicleReport.api.js`, `src/pages/reports/VehicleStatsPage.vue`)
 - **Issues:** raw response.data consumed (no envelope)
 
 #### `A-112` — `GET getModels`
@@ -1483,19 +1483,19 @@ Functions that fire more than one request. Each of these is a sequential round t
 #### `A-156` — `GET /operations/vehicle/report/chart-data`
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
-- **Purpose:** Fetches chart-data — called from loadVehicleChartData()
-- **Request:** (none detected)
-- **Response read by frontend:** data (raw)
-- **Used in:** `views/reports/VehicleStatsChart.vue`
+- **Purpose:** Per-model available/booked counts split by vehicle age, optionally per lessor — called from loadVehicleChartData()
+- **Request:** query: lessor (optional)
+- **Response — CONFIRMED against the live backend 2026-09-23:** object keyed by model name, each `{ available: { total, byAge }, booked: { total, byAge } }`; `byAge` maps age in whole years (`"0"`, `"1"`, ...) to a count.
+- **Used in:** `views/reports/VehicleStatsChart.vue`; also `ontrack-ops-v3` (`src/services/reports/vehicleReport.api.js`, `src/pages/reports/VehicleStatsPage.vue`)
 - **Issues:** raw response.data consumed (no envelope)
 
 #### `A-157` — `GET /operations/vehicle/report/vehicle-count-by-age`
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
-- **Purpose:** Fetches vehicle-count-by-age — called from loadVehicleData()
-- **Request:** (none detected)
-- **Response read by frontend:** data (raw)
-- **Used in:** `views/reports/VehicleCountsByAge.vue`
+- **Purpose:** Per-model vehicle counts by age in years (all statuses), optionally per lessor — called from loadVehicleData()
+- **Request:** query: lessor (optional)
+- **Response — CONFIRMED against the live backend 2026-09-23:** object keyed by model name, each mapping age in years to a vehicle count. Totals can exceed A-156's available + booked.
+- **Used in:** `views/reports/VehicleCountsByAge.vue`; also `ontrack-ops-v3` (`src/services/reports/vehicleReport.api.js`, `src/pages/reports/VehicleStatsPage.vue`)
 - **Issues:** raw response.data consumed (no envelope)
 
 #### `A-158` — `GET /operations/vehicles`
@@ -1582,14 +1582,15 @@ Functions that fire more than one request. Each of these is a sequential round t
 - **Request:** query: lessor, limit, offset
 - **Response read by frontend:** (not read, or read indirectly)
 - **Used in:** `views/vehicles/stats.vue`
+- **Note:** the only consumer (a vehicle report table) is commented out in the old app, so this call is effectively dead — not ported to `ontrack-ops-v3`.
 
 #### `A-167` — `GET operations/vehicle/report/v2`
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
-- **Purpose:** Fetches report — called from fetchVehiclesv2()
-- **Request:** query: lessor, limit, offset
-- **Response read by frontend:** (not read, or read indirectly)
-- **Used in:** `views/vehicles/stats.vue`
+- **Purpose:** Six headline cards for the Inventory Utilisation Report — called from fetchVehiclesv2()
+- **Request:** query: lessor (optional), limit, offset
+- **Response — CONFIRMED against the live backend 2026-09-23:** bare array of `{ label, percentage?, modelName?, createdAt?, count? }`; `percentage` is a preformatted string (`"70.31%"`), `createdAt` is the model record's creation date.
+- **Used in:** `views/vehicles/stats.vue`; also `ontrack-ops-v3` (`src/services/reports/vehicleReport.api.js`, `src/pages/reports/VehicleStatsPage.vue`)
 
 #### `A-168` — `PUT operations/vehicle/update/list-for-sale`
 

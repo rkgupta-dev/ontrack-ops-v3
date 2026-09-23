@@ -115,7 +115,7 @@ watch(activeTab, (value) => {
 
   <div v-else>
     <div class="text-body-2 text-medium-emphasis mb-1">Customer / {{ customer.id }}</div>
-    <h1 class="text-h4 font-weight-bold mb-2">{{ displayName }}</h1>
+    <h2 class="font-weight-bold mb-2">{{ displayName }}</h2>
     <div class="d-flex align-center flex-wrap ga-2 mb-2">
       <v-chip
         v-if="customer.aqStatus !== null && customer.aqStatus !== undefined"
