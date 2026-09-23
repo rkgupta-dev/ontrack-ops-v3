@@ -21,7 +21,6 @@ export const vuetify = createVuetify({
   defaults: {
     VBtn: {
       style: 'text-transform: none; letter-spacing: normal;',
-      rounded: 'lg',
       variant: 'flat',
     },
     VCard: { rounded: 'lg', variant: 'outlined', style: 'border-color: #E0E0E0;' },
