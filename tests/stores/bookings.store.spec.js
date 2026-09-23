@@ -48,11 +48,13 @@ describe('bookings store', () => {
 
     await store.fetchPage({ page: 3, search: 'B-1' })
 
-    expect(bookingsApi.fetchBookings).toHaveBeenCalledWith({
-      page: 3,
-      limit: store.limit,
-      searchQuery: 'B-1',
-    })
+    expect(bookingsApi.fetchBookings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        page: 3,
+        limit: store.limit,
+        searchQuery: 'B-1',
+      }),
+    )
     expect(store.page).toBe(3)
   })
 

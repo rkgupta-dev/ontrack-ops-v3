@@ -88,9 +88,9 @@ async function handleSubmit() {
           autocomplete="current-password"
           :rules="[rules.required('Password')]"
           :disabled="submitting"
-          @click:append-inner="showPassword = !showPassword"
           hide-details
           class="mb-2"
+          @click:append-inner="showPassword = !showPassword"
         />
         <v-checkbox v-model="saveForLater" hide-details :disabled="submitting" class="mb-1">
           <template #label>
