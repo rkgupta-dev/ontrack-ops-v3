@@ -193,19 +193,19 @@ Functions that fire more than one request. Each of these is a sequential round t
 #### `A-016` — `GET attribution/analytics/traffic-attribution`
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
-- **Purpose:** Fetches traffic-attribution — called from fetchData()
-- **Request:** query: endDate, startDate
-- **Response read by frontend:** data (raw)
-- **Used in:** `views/TrafficAttribution.vue`
+- **Purpose:** Traffic Attribution report, "By Traffic" mode: traffic, signups and conversions per source, medium, campaign, platform and attribution type, each compared with the previous period
+- **Request:** query: startDate, endDate (epoch ms, local start and end of day)
+- **Response read by frontend:** `{ success, type, totals[], attributedCount, bySource, bySourceMedium, bySourceCampaign, byPlatform, byAttributionType }`. Totals are Traffic, Signed Up and Converted; each total and group row has `label, count, previousCount, change, changePercent, trend`, and group rows add `signedUp, converted`. Confirmed 2026-09-24.
+- **Used in:** `views/TrafficAttribution.vue` (old) → v3 `src/pages/reports/TrafficAttributionPage.vue`
 - **Issues:** raw response.data consumed (no envelope)
 
 #### `A-017` — `GET attribution/analytics/traffic-attribution-by-value`
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
-- **Purpose:** Fetches traffic-attribution-by-value — called from fetchData()
-- **Request:** query: endDate, sortBy, sortOrder, startDate
-- **Response read by frontend:** data (raw)
-- **Used in:** `views/TrafficAttributionByValue.vue`
+- **Purpose:** Traffic Attribution report, "By Value" mode: the same groups as A-016, with conversion rates, sorted server-side
+- **Request:** query: startDate, endDate (epoch ms), sortBy (`count` \| `signedUp` \| `converted`), sortOrder (`asc` \| `desc`)
+- **Response read by frontend:** same envelope as A-016. Group rows carry `signup_conversion_rate` and `booking_conversion_rate` as "12.34" strings and have no trend; the Signed Up and Converted totals add `signed_up_conversion_rate` and `booking_conversion_rate`. Shape taken from the backend controller `getTrafficAttributionStatsByValue`; not yet confirmed with a live response.
+- **Used in:** `views/TrafficAttributionByValue.vue` (old) → v3 `src/pages/reports/TrafficAttributionPage.vue` (By Value mode)
 - **Issues:** raw response.data consumed (no envelope)
 
 #### `A-018` — `GET operations/analytics/rentals/metrics`

@@ -105,7 +105,7 @@ onMounted(() => {
 <template>
   <div>
     <div class="d-flex align-center justify-space-between flex-wrap ga-3 mb-4">
-      <h2 class="text-h5 font-weight-medium">Inventory Utilisation Report</h2>
+      <div class="text-h6 text-sm-h5 font-weight-bold">Inventory Utilisation Report</div>
       <v-select
         v-model="lessorFilter"
         :items="lessorOptions"

@@ -175,6 +175,12 @@ const routes = [
     meta: { layout: 'app', requiresAuth: true, title: 'Recovery List' },
   },
   {
+    path: '/traffic-attribution',
+    name: 'traffic-attribution',
+    component: () => import('../pages/reports/TrafficAttributionPage.vue'),
+    meta: { layout: 'app', requiresAuth: true, title: 'Traffic Attribution' },
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('../pages/NotFoundPage.vue'),

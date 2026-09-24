@@ -29,6 +29,11 @@ const navItems = [
   { to: { name: 'vehicle-stats' }, icon: 'mdi-chart-bar', label: 'Utilisation' },
   { to: { name: 'vehicle-reminders' }, icon: 'mdi-bell-alert-outline', label: 'Expiry Reminder' },
   { to: { name: 'recovery' }, icon: 'mdi-tow-truck', label: 'Recovery' },
+  {
+    to: { name: 'traffic-attribution' },
+    icon: 'mdi-chart-timeline-variant',
+    label: 'Traffic Attribution',
+  },
 ]
 
 // The floating mobile bar / desktop bottom bar only have room for the four
@@ -43,6 +48,7 @@ const bottomNavItems = navItems.filter(
       'vehicle-stats',
       'vehicle-reminders',
       'recovery',
+      'traffic-attribution',
     ].includes(item.to.name),
 )
 

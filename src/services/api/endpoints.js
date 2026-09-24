@@ -251,6 +251,9 @@ export const ENDPOINTS = {
   // A-032 — GET — vehicles tied to upcoming/active/expired bookings, with
   // GPS data, for the GPS Tracker map
   GPS_TRACKER_MAP_DATA: '/outreach/bookings/expired/map-data',
+  // A-016 / A-017 — GET — traffic attribution report (by traffic / by value)
+  TRAFFIC_ATTRIBUTION: 'attribution/analytics/traffic-attribution',
+  TRAFFIC_ATTRIBUTION_BY_VALUE: 'attribution/analytics/traffic-attribution-by-value',
 }
 
 // A-069 — GET — reverse geocode. Bare external call to Google, not part

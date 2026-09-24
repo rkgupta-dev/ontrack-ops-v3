@@ -36,6 +36,12 @@ function downloadBlob(content, mimeType, filename) {
   URL.revokeObjectURL(url)
 }
 
+/** Headerless 2-D rows (e.g. a multi-section report) → escaped CSV download. */
+export function exportCsvLines(lines, filenameBase) {
+  const csv = lines.map((line) => line.map(toCsvValue).join(',')).join('\n')
+  downloadBlob(csv, 'text/csv', `${filenameBase}.csv`)
+}
+
 export function exportRows(rows, format, filenameBase) {
   if (format === 'json') {
     downloadBlob(JSON.stringify(rows, null, 2), 'application/json', `${filenameBase}.json`)
