@@ -29,13 +29,21 @@ export async function fetchModelsStock({ location } = {}) {
  * Body: `{ show, price, old_price }` — exactly the three fields the old
  * app's edit modal sends. Response: `{ error, message }`; `error: 1` means
  * the update was rejected, surfaced here as a thrown Error.
+ * Admin-only: the backend returns 401 `{ error: 1, message: "You are not
+ * authorised to perform this action." }` for any other role, so the
+ * request opts out of the global 401 logout (see v2Client.js) and the
+ * page shows an "admins only" dialog instead.
  */
 export async function updateModel(modelId, { show, price, oldPrice }) {
-  const response = await v2Client.put(ENDPOINTS.MODEL_UPDATE(modelId), {
-    show,
-    price,
-    old_price: oldPrice,
-  })
+  const response = await v2Client.put(
+    ENDPOINTS.MODEL_UPDATE(modelId),
+    {
+      show,
+      price,
+      old_price: oldPrice,
+    },
+    { allowPermissionDenied: true },
+  )
   if (Number(response.data?.error) === 1) {
     throw new Error(response.data?.message || 'Could not update model.')
   }

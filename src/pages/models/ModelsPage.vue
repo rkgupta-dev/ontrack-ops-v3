@@ -5,7 +5,7 @@ import { useDisplay } from 'vuetify'
 import * as modelsApi from '../../services/models/models.api'
 import { fetchLocations } from '../../services/home/home.api'
 import { formatCurrency } from '../../utils/currency'
-import { toUserMessage } from '../../utils/errorMessage'
+import { isPermissionDenied, toUserMessage } from '../../utils/errorMessage'
 import { useUiStore } from '../../stores/ui.store'
 import EmptyState from '../../components/common/EmptyState.vue'
 
@@ -83,6 +83,8 @@ const editOpen = ref(false)
 const editForm = ref(null)
 const saving = ref(false)
 const formRef = ref(null)
+// Shown instead of a toast when a non-admin tries to save (A-110 is ADMIN-only).
+const permissionDenied = ref(false)
 
 const priceRules = [
   (v) => (v !== '' && v !== null && v !== undefined) || 'Required',
@@ -115,7 +117,12 @@ async function submitEdit() {
     editOpen.value = false
     loadModels()
   } catch (err) {
-    uiStore.notify(toUserMessage(err), { type: 'error' })
+    if (isPermissionDenied(err)) {
+      editOpen.value = false
+      permissionDenied.value = true
+    } else {
+      uiStore.notify(toUserMessage(err), { type: 'error' })
+    }
   } finally {
     saving.value = false
   }
@@ -368,6 +375,31 @@ onMounted(() => {
           >
           <v-btn color="primary" variant="flat" rounded="lg" :loading="saving" @click="submitEdit">
             Save changes
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="permissionDenied" max-width="400">
+      <v-card rounded="lg" class="pa-2">
+        <div class="d-flex flex-column align-center text-center pa-4 pb-2">
+          <v-avatar color="warning" variant="tonal" size="56" class="mb-3">
+            <v-icon icon="mdi-shield-lock-outline" size="30" />
+          </v-avatar>
+          <div class="text-h6 font-weight-bold mb-1">Admin access required</div>
+          <div class="text-body-2 text-medium-emphasis">
+            Only admins can change a model's price or visibility. Ask an admin to make this change.
+          </div>
+        </div>
+        <v-card-actions class="justify-center pb-4">
+          <v-btn
+            color="primary"
+            variant="flat"
+            rounded="lg"
+            class="text-none px-6"
+            @click="permissionDenied = false"
+          >
+            OK
           </v-btn>
         </v-card-actions>
       </v-card>

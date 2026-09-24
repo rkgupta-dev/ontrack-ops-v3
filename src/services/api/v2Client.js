@@ -1,6 +1,7 @@
 import { createHttpClient } from './httpClient'
 import { getToken } from '../tokenStorage'
 import { useUiStore } from '../../stores/ui.store'
+import { isPermissionDenied } from '../../utils/errorMessage'
 
 /**
  * Shared client for every v2 (glacier.on-track.in) endpoint — Bearer
@@ -53,7 +54,12 @@ v2Client.interceptors.response.use(
     if (!error.config?.skipGlobalLoading) {
       useUiStore().stopLoading()
     }
-    if (error.response?.status === 401 && unauthorizedHandler) {
+    // A request that sets `{ allowPermissionDenied: true }` (admin-only
+    // actions) keeps the session on a role rejection, so the page can say
+    // "admins only" instead of logging a valid agent out. A genuine
+    // expired-session 401 still logs out as usual.
+    const permissionDenied = error.config?.allowPermissionDenied && isPermissionDenied(error)
+    if (error.response?.status === 401 && unauthorizedHandler && !permissionDenied) {
       unauthorizedHandler()
     }
     return Promise.reject(error)

@@ -115,4 +115,32 @@ describe('v2Client', () => {
     expect(config.data).toBe('{"a":1}')
     expect(config.headers.getContentType()).toContain('application/json')
   })
+
+  it('keeps the session on a role rejection when the request opts in', async () => {
+    const handler = vi.fn()
+    setUnauthorizedHandler(handler)
+    const responseErrorInterceptor = v2Client.interceptors.response.handlers[0].rejected
+    const roleRejection = {
+      config: { allowPermissionDenied: true },
+      response: { status: 401, data: { error: 1, message: 'You are not authorised.' } },
+    }
+
+    await expect(responseErrorInterceptor(roleRejection)).rejects.toBeDefined()
+
+    expect(handler).not.toHaveBeenCalled()
+  })
+
+  it('still logs out on a plain-text 401 even when the request opts in', async () => {
+    const handler = vi.fn()
+    setUnauthorizedHandler(handler)
+    const responseErrorInterceptor = v2Client.interceptors.response.handlers[0].rejected
+    const expiredSession = {
+      config: { allowPermissionDenied: true },
+      response: { status: 401, data: 'You are not permitted to perform this action' },
+    }
+
+    await expect(responseErrorInterceptor(expiredSession)).rejects.toBeDefined()
+
+    expect(handler).toHaveBeenCalledOnce()
+  })
 })
