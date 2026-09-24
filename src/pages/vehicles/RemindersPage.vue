@@ -76,11 +76,10 @@ function overdueText(dateStr) {
   return `${days} day${days === 1 ? '' : 's'} overdue`
 }
 
-/** Other documents on the same vehicle that have also expired. */
-function otherExpired(vehicle) {
-  return EXPIRY_FIELDS.filter(
-    (doc) => doc.type !== expiryType.value && isExpired(vehicle[doc.field]),
-  )
+/** Every expired document on the vehicle, the selected one first. */
+function expiredDocs(vehicle) {
+  const expired = EXPIRY_FIELDS.filter((doc) => isExpired(vehicle[doc.field]))
+  return expired.sort((a, b) => (b.type === expiryType.value) - (a.type === expiryType.value))
 }
 
 function vehicleLink(vehicle) {
@@ -152,7 +151,7 @@ onMounted(() => load(initialExpiryType))
       </v-btn>
     </div>
 
-    <!-- Expiry filter: one full-width segmented row; icons hidden on phones -->
+    <!-- Expiry filter: one full-width segmented row -->
     <v-btn-toggle
       :model-value="expiryType"
       color="primary"
@@ -165,7 +164,6 @@ onMounted(() => load(initialExpiryType))
       @update:model-value="load"
     >
       <v-btn v-for="doc in EXPIRY_FIELDS" :key="doc.type" :value="doc.type" class="text-none">
-        <v-icon :icon="doc.icon" start class="d-none d-sm-inline-flex" />
         {{ doc.short }}
       </v-btn>
     </v-btn-toggle>
@@ -215,20 +213,21 @@ onMounted(() => load(initialExpiryType))
               </div>
             </div>
 
-            <!-- Other expired documents on the same vehicle -->
-            <div v-if="otherExpired(vehicle).length" class="d-flex flex-wrap ga-1 mt-2 other-docs">
-              <span class="text-caption text-medium-emphasis mr-1 align-self-center">
-                Also expired:
-              </span>
+            <!-- All expired documents on this vehicle; the selected one in red -->
+            <div v-if="expiredDocs(vehicle).length" class="d-flex flex-wrap align-center ga-1 mt-2">
+              <span class="text-caption text-medium-emphasis mr-1">Expired:</span>
               <v-chip
-                v-for="doc in otherExpired(vehicle)"
+                v-for="doc in expiredDocs(vehicle)"
                 :key="doc.type"
-                size="x-small"
-                color="warning"
+                size="small"
+                :color="doc.type === expiryType ? 'error' : 'warning'"
                 variant="tonal"
                 label
               >
                 {{ doc.short }}
+                <span class="d-none d-sm-inline">
+                  &nbsp;· {{ formatDateOnly(vehicle[doc.field]) }}
+                </span>
               </v-chip>
             </div>
           </v-list-item>
@@ -278,10 +277,5 @@ onMounted(() => load(initialExpiryType))
     padding-inline: 4px;
     font-size: 0.8125rem;
   }
-}
-
-/* Line up with the registration text, past the 40px avatar + gap. */
-.other-docs {
-  padding-left: 52px;
 }
 </style>
