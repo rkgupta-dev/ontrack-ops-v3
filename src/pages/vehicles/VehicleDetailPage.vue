@@ -232,11 +232,29 @@ async function submitResale() {
       <div class="text-caption text-medium-emphasis mt-2">
         {{ formatFullDate(vehicle.bookingData.createdAt) }}
       </div>
-      <div class="font-weight-medium">
+      <!-- Both links open in a new tab so the vehicle page stays put. -->
+      <RouterLink
+        v-if="vehicle.bookingData.customerData?.id ?? vehicle.bookingData.customer"
+        :to="{
+          name: 'customer-detail',
+          params: {
+            customerId: vehicle.bookingData.customerData?.id ?? vehicle.bookingData.customer,
+          },
+        }"
+        target="_blank"
+        rel="noopener"
+        class="d-block font-weight-medium text-decoration-none"
+      >
+        {{ vehicle.bookingData.customerData?.fName }} {{ vehicle.bookingData.customerData?.lName }}
+      </RouterLink>
+      <div v-else class="font-weight-medium">
         {{ vehicle.bookingData.customerData?.fName }} {{ vehicle.bookingData.customerData?.lName }}
       </div>
       <RouterLink
         :to="{ name: 'booking-detail', params: { bookingId: vehicle.bookingData.bookingId } }"
+        target="_blank"
+        rel="noopener"
+        class="font-weight-medium text-decoration-none"
       >
         {{ vehicle.bookingData.bookingId }}
       </RouterLink>

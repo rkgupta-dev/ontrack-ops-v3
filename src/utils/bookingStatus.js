@@ -12,7 +12,7 @@
  */
 export const BOOKING_STATUS_META = {
   0: { label: 'Upcoming', color: 'primary' },
-  1: { label: 'Ongoing', color: 'success' },
+  1: { label: 'Active', color: 'success' },
   2: { label: 'Completed', color: 'warning' },
   3: { label: 'Expired', color: 'error' },
   4: { label: 'Under Service', color: 'primary' },
