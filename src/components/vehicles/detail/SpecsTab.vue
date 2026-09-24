@@ -5,6 +5,7 @@ import * as vehicleDetailApi from '../../../services/vehicles/vehicleDetail.api'
 import { useUiStore } from '../../../stores/ui.store'
 import { toUserMessage } from '../../../utils/errorMessage'
 import { formatFullDate } from '../../../utils/date'
+import { lessorName } from '../../../utils/fields'
 
 const props = defineProps({
   vehicle: { type: Object, required: true },
@@ -203,7 +204,7 @@ async function confirmImageUpload() {
       </v-col>
       <v-col cols="12" md="6">
         <div class="text-caption text-medium-emphasis">Owner</div>
-        <div>{{ vehicle.lessorData?.name ?? '—' }}</div>
+        <div>{{ lessorName(vehicle.lessorData, '—') }}</div>
       </v-col>
 
       <v-col cols="12" md="6">

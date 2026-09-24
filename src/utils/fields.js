@@ -15,3 +15,13 @@ export function firstPresent(record, fields, fallback = null) {
   }
   return fallback
 }
+
+/**
+ * Display name for a lessor record. A-089 (lessor list) returns some
+ * lessors with `name: null` (e.g. id 40), so a record that exists but has
+ * no name reads "Unknown". No record at all → `fallback`.
+ */
+export function lessorName(lessor, fallback = null) {
+  if (!lessor) return fallback
+  return (typeof lessor.name === 'string' && lessor.name.trim()) || 'Unknown'
+}

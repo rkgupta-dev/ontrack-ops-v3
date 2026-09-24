@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { firstPresent } from '../../src/utils/fields'
+import { firstPresent, lessorName } from '../../src/utils/fields'
 
 describe('firstPresent', () => {
   it('returns the value of the first candidate field that is present', () => {
@@ -20,5 +20,21 @@ describe('firstPresent', () => {
 
   it('returns the fallback when no candidate matches', () => {
     expect(firstPresent({}, ['a', 'b'], 'unknown')).toBe('unknown')
+  })
+})
+
+describe('lessorName', () => {
+  it('returns the name when present', () => {
+    expect(lessorName({ id: 2, name: 'TRADENET PRIME' })).toBe('TRADENET PRIME')
+  })
+
+  it('reads "Unknown" for a lessor with a null or blank name', () => {
+    expect(lessorName({ id: 40, name: null })).toBe('Unknown')
+    expect(lessorName({ id: 41, name: '  ' })).toBe('Unknown')
+  })
+
+  it('returns the fallback when there is no lessor record', () => {
+    expect(lessorName(null)).toBeNull()
+    expect(lessorName(undefined, '—')).toBe('—')
   })
 })

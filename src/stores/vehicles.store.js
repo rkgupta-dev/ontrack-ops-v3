@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import * as vehiclesApi from '../services/vehicles/vehicles.api'
 import { fetchLocations } from '../services/home/home.api'
-import { firstPresent } from '../utils/fields'
+import { firstPresent, lessorName } from '../utils/fields'
 
 // A-158 row shape — CONFIRMED against the live backend 2026-09-07 (see
 // docs/api-reference.md A-158 for the full field dump). Envelope is
@@ -19,7 +19,7 @@ function toRow(record, locationsById) {
     id: firstPresent(record, ['id']),
     registrationNumber: record?.registrationNumber ?? null,
     model: record?.modelData?.name ?? null,
-    lessor: record?.lessorData?.name ?? null,
+    lessor: lessorName(record?.lessorData),
     color: record?.color ?? null,
     location: locationsById.get(record?.location) ?? null,
     subStatus: record?.subStatus ?? null,

@@ -1,6 +1,7 @@
 import { v2Client } from '../api/v2Client'
 import { ENDPOINTS } from '../api/endpoints'
 import { extractRows, extractTotal } from '../../utils/listResponse'
+import { lessorName } from '../../utils/fields'
 
 /**
  * A-158 — GET /operations/vehicles
@@ -56,7 +57,7 @@ export async function fetchModelOptions() {
 export async function fetchLessorOptions() {
   const response = await v2Client.get(ENDPOINTS.LESSORS_LIST)
   const rows = Array.isArray(response.data) ? response.data : []
-  return rows.map((row) => ({ title: row.name, value: row.id }))
+  return rows.map((row) => ({ title: lessorName(row), value: row.id }))
 }
 
 /**

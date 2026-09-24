@@ -52,15 +52,37 @@ function paymentIdOf(b) {
     </div>
 
     <div class="mb-4">
-      <h3 class="text-h6 font-weight-medium">
+      <h3 class="text-h6 font-weight-medium d-flex align-center ga-1">
         {{ booking.customerData?.fName }} {{ booking.customerData?.lName }}
+        <!-- Customer's profile in the Outreach app, same host as the KM-bill links. -->
+        <v-btn
+          v-if="booking.customerData?.id ?? booking.customer"
+          :href="`https://ontrack-outreach.web.app/customer/${booking.customerData?.id ?? booking.customer}`"
+          target="_blank"
+          rel="noopener"
+          icon="mdi-open-in-new"
+          variant="text"
+          color="primary"
+          size="small"
+          density="comfortable"
+          aria-label="Open customer in Outreach"
+          title="Open customer in Outreach"
+        />
       </h3>
       <div class="d-flex ga-3 text-body-2 mt-1">
-        <a v-if="booking.customerData?.mobile" :href="`tel:${booking.customerData.mobile}`">
+        <a
+          v-if="booking.customerData?.mobile"
+          :href="`tel:${booking.customerData.mobile}`"
+          class="d-block font-weight-medium text-decoration-none"
+        >
           {{ booking.customerData.mobile }}
         </a>
         <span v-if="booking.customerData?.mobile && booking.customerData?.email">~</span>
-        <a v-if="booking.customerData?.email" :href="`mailto:${booking.customerData.email}`">
+        <a
+          v-if="booking.customerData?.email"
+          :href="`mailto:${booking.customerData.email}`"
+          class="d-block font-weight-medium text-decoration-none"
+        >
           {{ booking.customerData.email }}
         </a>
       </div>
