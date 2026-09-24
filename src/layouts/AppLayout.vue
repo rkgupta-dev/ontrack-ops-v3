@@ -68,6 +68,7 @@ function isActive(name) {
 }
 
 const isHome = computed(() => route.name === 'home')
+const isStaging = import.meta.env.MODE === 'staging'
 
 // Home is the app's root — every other page gets a "< back" link, with a
 // title alongside it when the route declares one (`meta.title`,
@@ -222,6 +223,18 @@ function handleLogout() {
         </v-toolbar-title>
 
         <v-spacer />
+
+        <!-- Only in `--mode staging` builds, so staging is never mistaken for prod. -->
+        <v-chip
+          v-if="isStaging"
+          color="warning"
+          variant="flat"
+          size="small"
+          label
+          class="font-weight-bold mr-2"
+        >
+          STAGING
+        </v-chip>
 
         <v-avatar
           v-if="isHome"

@@ -8,8 +8,11 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:staging": "vite --mode staging",
     "build": "vite build",
+    "build:staging": "vite build --mode staging",
     "preview": "vite preview",
+    "deploy:staging": "npm run build:staging && firebase deploy --only hosting:staging",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "test": "NODE_OPTIONS=--no-experimental-webstorage vitest run",

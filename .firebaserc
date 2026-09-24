@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "ontrack-operations"
+  },
+  "targets": {
+    "ontrack-operations": {
+      "hosting": {
+        "staging": [
+          "ontrack-ops-staging"
+        ]
+      }
+    }
+  }
+}

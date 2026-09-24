@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository state
 
-`ontrack-ops-v3` is currently a **planning/documentation repository**, not a codebase. There is no source code, package manifest, build system, or test suite yet — the repo contains only the `docs/` directory described below. Do not assume a framework, language, or tooling; nothing has been chosen yet. When the user starts adding actual application code, revisit this file and replace this section with real build/lint/test commands.
+`ontrack-ops-v3` is now a working **Vue 3 + Vuetify 3 + Pinia + Vite** app that is migrating the old `operationsapp-frontend`. See `README.md` for setup, environments (local / staging / production), deployment and project layout. Key commands: `npm run dev`, `npm run lint`, `npm run test`, `npm run build`, `npm run deploy:staging`. This repo deploys to **staging only** (https://ontrack-ops-staging.web.app). The production site `ontrack-operations.web.app` still serves the old app; never add a live deploy without explicit sign-off.
 
 ## What this project is
 
