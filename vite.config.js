@@ -32,8 +32,8 @@ export default defineConfig({
         description: 'Ontrack fleet operations — bookings, vehicles, customers.',
         start_url: '/',
         display: 'standalone',
-        background_color: '#F5F7FA',
-        theme_color: '#1867C0',
+        background_color: '#4E44D8',
+        theme_color: '#4E44D8',
         icons: [
           { src: 'android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
           { src: 'android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
