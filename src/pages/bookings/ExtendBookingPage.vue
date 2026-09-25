@@ -30,6 +30,18 @@ const overdueWarning = computed(() => {
 })
 const overdueBlocked = computed(() => extendResponse.value?.minDaysToExtend > 30)
 
+const summaryRows = computed(() => {
+  const r = extendResponse.value
+  if (!r) return []
+  return [
+    { label: 'Extend For', value: `${r.days} days` },
+    { label: 'Rental Amount', value: formatCurrency(r.rentalAmountBeforeSurge) },
+    { label: 'Surge Charge', value: formatCurrency(r.surgeCharge) },
+    { label: 'Penalty', value: formatCurrency(r.penalty), color: 'text-error' },
+    { label: 'Discount', value: formatCurrency(r.adjustedDiscount), color: 'text-success' },
+  ]
+})
+
 async function calculatePayment() {
   loading.value = true
   errorMessage.value = ''
@@ -98,125 +110,196 @@ async function createOrder() {
 </script>
 
 <template>
-  <div style="max-width: 800px">
+  <div class="mx-auto" style="max-width: 960px">
+    <div v-if="loading && !extendResponse" class="d-flex justify-center py-10">
+      <v-progress-circular indeterminate color="primary" />
+    </div>
+
+    <v-alert v-else-if="feedbackMessage" type="info" variant="tonal" rounded="lg" class="mb-4">
+      {{ feedbackMessage }}
+    </v-alert>
+
     <template v-if="extendResponse">
-      <v-alert v-if="overdueWarning" type="warning" variant="tonal" class="mb-3">
+      <v-alert v-if="overdueWarning" type="warning" variant="tonal" rounded="lg" class="mb-4">
         Booking is overdue by {{ extendResponse.minDaysToExtend - 1 }} days, a minimum
         {{ extendResponse.minDaysToExtend > 15 ? 30 : extendResponse.minDaysToExtend }} days should
         be extended.
       </v-alert>
-      <v-alert v-if="overdueBlocked" type="error" variant="tonal" class="mb-3">
+      <v-alert v-if="overdueBlocked" type="error" variant="tonal" rounded="lg" class="mb-4">
         This booking has been overdue for more than 30 days, so a standard extension is not
         feasible. Please escalate this matter to upper-level management for further attention.
       </v-alert>
 
       <v-row>
-        <v-col cols="12" md="6">
-          <div v-if="feedbackMessage">{{ feedbackMessage }}</div>
-          <div v-if="loading" class="text-medium-emphasis">loading...</div>
-          <div v-else class="text-caption text-medium-emphasis">
-            Calculated on: {{ calculatedOn }}
-          </div>
+        <!-- Booking summary -->
+        <v-col cols="12" md="5">
+          <v-card v-if="responseData" variant="outlined" rounded="lg" class="pa-4">
+            <div class="d-flex align-center justify-space-between ga-2 mb-3">
+              <div class="text-subtitle-2 font-weight-bold">Booking</div>
+              <BookingStatusBadge :status="responseData.status" />
+            </div>
 
-          <div v-if="responseData" class="mt-4">
-            <div class="text-caption text-medium-emphasis mb-1">Booking Highlight</div>
-            <BookingStatusBadge :status="responseData.status" />
-            <div class="mt-1">{{ bookingId }}</div>
-            <div v-if="responseData.vehicleData" class="font-weight-bold">
-              {{ responseData.vehicleData.registrationNumber }}
+            <div class="text-caption text-medium-emphasis">Booking ID</div>
+            <div class="text-body-2 mb-3 text-break">{{ bookingId }}</div>
+
+            <div class="d-flex align-center ga-3 mb-3">
+              <v-avatar color="primary" variant="tonal" rounded="lg">
+                <v-img
+                  v-if="responseData.modelData?.image"
+                  :src="responseData.modelData.image"
+                  :alt="responseData.modelData.name"
+                  cover
+                  height="30"
+                />
+                <v-icon v-else icon="mdi-motorbike" />
+              </v-avatar>
+              <div style="min-width: 0">
+                <div v-if="responseData.vehicleData" class="font-weight-bold">
+                  {{ responseData.vehicleData.registrationNumber }}
+                </div>
+                <div class="text-body-2 text-medium-emphasis text-truncate">
+                  {{ responseData.modelData?.name }}
+                </div>
+              </div>
             </div>
-            <div class="text-medium-emphasis">{{ responseData.modelData?.name }}</div>
-            <div class="mt-1">
-              {{ responseData.startDate }} <span class="text-medium-emphasis">------</span>
-              {{ responseData.endDate }}
+
+            <v-divider class="mb-3" />
+
+            <div class="d-flex align-center justify-space-between ga-2 text-body-2">
+              <div>
+                <div class="text-caption text-medium-emphasis">Start</div>
+                <div class="font-weight-medium">{{ responseData.startDate }}</div>
+              </div>
+              <v-icon icon="mdi-arrow-right" size="18" class="text-medium-emphasis" />
+              <div class="text-right">
+                <div class="text-caption text-medium-emphasis">Current End</div>
+                <div class="font-weight-medium">{{ responseData.endDate }}</div>
+              </div>
             </div>
-          </div>
+
+            <div class="text-caption text-medium-emphasis mt-4">
+              Calculated on {{ calculatedOn }}
+            </div>
+          </v-card>
         </v-col>
 
-        <v-col cols="12" md="6">
-          <v-card variant="outlined" class="pa-4">
-            <template v-if="responseData?.plan_type !== 'WEEKLY'">
-              <v-checkbox
-                v-model="extendForMonth"
-                label="Extend for a month"
-                :disabled="overdueBlocked"
-                density="compact"
+        <!-- Extension calculator -->
+        <v-col cols="12" md="7">
+          <v-card variant="outlined" rounded="lg" :loading="loading">
+            <div class="pa-4">
+              <template v-if="responseData?.plan_type !== 'WEEKLY'">
+                <div class="text-subtitle-2 font-weight-bold mb-2">Extend by</div>
+                <v-switch
+                  v-model="extendForMonth"
+                  label="Extend for a month"
+                  color="primary"
+                  inset
+                  :disabled="overdueBlocked"
+                  density="compact"
+                  hide-details
+                  @update:model-value="calculatePayment"
+                />
+
+                <div class="d-flex align-center ga-3 my-2">
+                  <v-divider />
+                  <span class="text-caption text-medium-emphasis">or</span>
+                  <v-divider />
+                </div>
+
+                <div class="d-flex align-center justify-space-between mb-1">
+                  <span class="text-body-2">Number of days</span>
+                  <v-chip size="small" label :disabled="extendForMonth">
+                    {{ daysToExtend }} day{{ daysToExtend > 1 ? 's' : '' }}
+                  </v-chip>
+                </div>
+                <v-slider
+                  v-model="daysToExtend"
+                  :min="minDaysToExtend"
+                  :max="15"
+                  step="1"
+                  color="primary"
+                  thumb-label
+                  hide-details
+                  :disabled="extendForMonth || overdueBlocked"
+                  @end="calculatePayment"
+                />
+
+                <v-card
+                  variant="tonal"
+                  color="primary"
+                  rounded="lg"
+                  class="d-flex align-center justify-space-between flex-wrap ga-2 pa-3 mt-3"
+                >
+                  <div class="d-flex align-center ga-2">
+                    <v-icon icon="mdi-calendar-check" />
+                    <span class="text-body-2">New End Date</span>
+                  </div>
+                  <span class="font-weight-bold">{{ extendResponse.newEndDate }}</span>
+                </v-card>
+
+                <v-divider class="my-4" />
+              </template>
+
+              <div class="d-flex align-center justify-space-between mb-1">
+                <span class="text-subtitle-2 font-weight-bold">Adjust discount</span>
+                <v-chip size="small" label color="success" variant="tonal">
+                  {{ formatCurrency(adjustedDiscount) }}
+                </v-chip>
+              </div>
+              <v-slider
+                v-model="adjustedDiscount"
+                :min="0"
+                :max="maxDiscount"
+                step="50"
+                color="success"
                 hide-details
                 @update:model-value="calculatePayment"
               />
-              <div class="text-center text-caption text-medium-emphasis my-1">------ or ------</div>
-              <div class="text-center mb-1">
-                Extend for {{ daysToExtend }} day{{ daysToExtend > 1 ? 's' : '' }}
+            </div>
+
+            <v-divider />
+
+            <div class="pa-4">
+              <div
+                v-for="row in summaryRows"
+                :key="row.label"
+                class="d-flex justify-space-between py-1 text-body-2"
+                :class="row.color"
+              >
+                <span :class="{ 'text-medium-emphasis': !row.color }">{{ row.label }}</span>
+                <span>{{ row.value }}</span>
               </div>
-              <v-slider
-                v-model="daysToExtend"
-                :min="minDaysToExtend"
-                :max="15"
-                step="1"
-                :disabled="extendForMonth || overdueBlocked"
-                @end="calculatePayment"
-              />
-              <div class="text-center mb-2">
-                <div class="text-caption text-medium-emphasis">New End Date</div>
-                <div class="font-weight-bold">{{ extendResponse.newEndDate }}</div>
+
+              <v-divider class="my-3" />
+
+              <div class="d-flex align-center justify-space-between">
+                <span class="text-body-2 font-weight-medium">Payable Amount</span>
+                <span class="text-h5 font-weight-bold">
+                  {{ formatCurrency(extendResponse.totalAmount) }}
+                </span>
               </div>
-              <v-divider class="mb-3" />
-            </template>
 
-            <div class="d-flex justify-space-between">
-              <span>Adjust Discounts</span>
-              <span>{{ adjustedDiscount }}</span>
+              <v-btn
+                block
+                size="large"
+                variant="flat"
+                rounded="lg"
+                color="primary"
+                class="mt-4"
+                :loading="creatingOrder"
+                :disabled="loading || overdueBlocked"
+                @click="createOrder"
+              >
+                Create Order
+              </v-btn>
             </div>
-            <v-slider
-              v-model="adjustedDiscount"
-              :min="0"
-              :max="maxDiscount"
-              step="50"
-              @update:model-value="calculatePayment"
-            />
-            <v-divider class="my-2" />
-
-            <div class="d-flex justify-space-between py-1">
-              <span>Extend For</span><span>{{ extendResponse.days }} days</span>
-            </div>
-            <div class="d-flex justify-space-between py-1">
-              <span>Rental Amount</span
-              ><span>{{ formatCurrency(extendResponse.rentalAmountBeforeSurge) }}</span>
-            </div>
-            <div class="d-flex justify-space-between py-1">
-              <span>Surge Charge</span><span>{{ formatCurrency(extendResponse.surgeCharge) }}</span>
-            </div>
-            <div class="d-flex justify-space-between py-1 text-error">
-              <span>Penalty</span><span>{{ formatCurrency(extendResponse.penalty) }}</span>
-            </div>
-            <div class="d-flex justify-space-between py-1 text-success">
-              <span>Discount</span
-              ><span>{{ formatCurrency(extendResponse.adjustedDiscount) }}</span>
-            </div>
-            <v-divider class="my-2" />
-            <div class="d-flex justify-space-between py-1 font-weight-bold">
-              <span>Payable Amount</span
-              ><span>{{ formatCurrency(extendResponse.totalAmount) }}</span>
-            </div>
-
-            <v-btn
-              block
-              variant="flat"
-              rounded="lg"
-              color="primary"
-              class="mt-4"
-              :loading="creatingOrder"
-              @click="createOrder"
-            >
-              Create Order
-            </v-btn>
           </v-card>
         </v-col>
       </v-row>
     </template>
 
-    <v-alert v-if="errorMessage" type="error" variant="tonal" class="mt-3">{{
-      errorMessage
-    }}</v-alert>
+    <v-alert v-if="errorMessage" type="error" variant="tonal" rounded="lg" class="mt-4">
+      {{ errorMessage }}
+    </v-alert>
   </div>
 </template>

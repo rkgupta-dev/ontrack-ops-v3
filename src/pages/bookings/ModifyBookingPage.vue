@@ -304,7 +304,7 @@ async function submitModify() {
         <v-select v-model="model" label="Model *" :items="modelOptions" variant="outlined" />
       </v-col>
       <v-col cols="6" sm="4">
-        <div class="text-caption text-medium-emphasis mb-1">Vehicle *</div>
+        <!-- <div class="text-caption text-medium-emphasis mb-1">Vehicle *</div> -->
         <v-card variant="outlined" class="pa-3" link @click="vehiclePickerDialog = true">
           {{ selectedRegn || 'Please Select Vehicle' }}
         </v-card>
@@ -359,7 +359,7 @@ async function submitModify() {
     <v-dialog v-model="detailsDialog" max-width="560" scrollable>
       <v-card title="Modify Details">
         <v-card-text>
-          <v-row>
+          <v-row class="mt-2">
             <v-col cols="6">
               <v-select
                 v-model="transactionType"
@@ -368,6 +368,7 @@ async function submitModify() {
                   { title: 'Received from Customer', value: 'credit' },
                   { title: 'Paid to Customer', value: 'debit' },
                 ]"
+                variant="outlined"
               />
             </v-col>
             <v-col cols="6">
@@ -376,25 +377,38 @@ async function submitModify() {
                 v-model.number="amount"
                 type="number"
                 label="Amount *"
+                variant="outlined"
               />
               <v-text-field
                 v-else
                 v-model.number="refundedAmount"
                 type="number"
                 label="Refunded Amount *"
+                variant="outlined"
               />
             </v-col>
             <v-col cols="6">
-              <v-select v-model="source" label="Source *" :items="SOURCE_OPTIONS" />
+              <v-select
+                v-model="source"
+                label="Source *"
+                :items="SOURCE_OPTIONS"
+                variant="outlined"
+              />
             </v-col>
             <v-col cols="6">
               <v-text-field
                 v-model="paymentId"
                 :label="`${transactionType === 'credit' ? 'Payment' : 'Refund'} Id *`"
+                variant="outlined"
               />
             </v-col>
             <v-col v-if="tab === 'exchange'" cols="12">
-              <v-select v-model="reason" label="Reason *" :items="REASON_OPTIONS" />
+              <v-select
+                v-model="reason"
+                label="Reason *"
+                :items="REASON_OPTIONS"
+                variant="outlined"
+              />
             </v-col>
             <v-col v-if="tab === 'exchange'" cols="12">
               <div class="text-caption text-medium-emphasis mb-1">Vehicle Image *</div>
@@ -403,6 +417,9 @@ async function submitModify() {
                   accept="image/*"
                   density="compact"
                   label="Upload"
+                  variant="outlined"
+                  rounded="lg"
+                  prepend-icon=""
                   hide-details
                   @update:model-value="onExchangeImageChange"
                 />
@@ -423,21 +440,41 @@ async function submitModify() {
               </div>
             </v-col>
             <v-col cols="12">
-              <v-textarea v-model="comment" label="Comment *" rows="2" />
+              <v-textarea
+                v-model="comment"
+                label="Comment *"
+                rows="2"
+                variant="outlined"
+                rounded="lg"
+              />
             </v-col>
             <v-col cols="8">
-              <v-text-field v-model="paymentReceivedDate" type="date" label="Payment Date *" />
+              <v-text-field
+                v-model="paymentReceivedDate"
+                type="date"
+                label="Payment Date *"
+                variant="outlined"
+                hide-details
+              />
             </v-col>
             <v-col cols="4">
-              <v-text-field v-model="paymentReceivedTime" type="time" label="Payment Time *" />
+              <v-text-field
+                v-model="paymentReceivedTime"
+                type="time"
+                label="Payment Time *"
+                variant="outlined"
+                hide-details
+              />
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
+          <v-spacer />
           <v-btn
             v-if="tab === 'extend'"
-            block
             color="primary"
+            variant="flat"
+            rounded="lg"
             :loading="updating"
             :disabled="isDisabledExtend"
             @click="submitModify"
@@ -446,8 +483,9 @@ async function submitModify() {
           </v-btn>
           <v-btn
             v-else
-            block
             color="primary"
+            variant="flat"
+            rounded="lg"
             :loading="updating"
             :disabled="isDisabledExchange"
             @click="submitModify"

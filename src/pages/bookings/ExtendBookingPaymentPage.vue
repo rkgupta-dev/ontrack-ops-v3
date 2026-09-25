@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import * as extensionsApi from '../../services/bookings/extensions.api'
 import * as extendApi from '../../services/bookings/extendBooking.api'
@@ -16,6 +16,18 @@ const loading = ref(true)
 const errorMessage = ref('')
 const extendResponse = ref(null)
 const showBreakup = ref(false)
+
+const breakupRows = computed(() => {
+  const data = extendResponse.value
+  if (!data) return []
+  return [
+    { label: 'Rental', value: data.rentalAmount },
+    { label: 'Surge Charge', value: data.surgeCharge },
+    { label: 'Adjusted Discount', value: data.adjustedDiscount },
+    { label: 'Penalty Charge', value: data.penaltyCharge },
+    { label: 'Coupon Discount', value: data.couponDiscount },
+  ]
+})
 
 async function load() {
   loading.value = true
@@ -136,121 +148,234 @@ async function confirmCashPayment() {
 
     <template v-else-if="extendResponse">
       <!-- Already paid -->
-      <div v-if="extendResponse.paymentStatus === 1" class="text-center py-6">
-        <v-icon icon="mdi-check-circle" color="success" size="40" class="mb-2" />
-        <div class="font-weight-bold">Payment Already Received</div>
-        <div class="text-medium-emphasis">We have already received the payment for this order.</div>
-        <v-card variant="outlined" class="mt-6 pa-4 text-left">
-          <div class="d-flex justify-space-between py-1">
-            <span>Rental</span><span>{{ formatCurrency(extendResponse.rentalAmount) }}</span>
+      <v-card v-if="extendResponse.paymentStatus === 1" variant="outlined" rounded="lg">
+        <div class="text-center pa-6">
+          <v-avatar color="success" variant="tonal" size="56" class="mb-3">
+            <v-icon icon="mdi-check-circle" size="32" />
+          </v-avatar>
+          <div class="text-subtitle-1 font-weight-bold">Payment Already Received</div>
+          <div class="text-body-2 text-medium-emphasis">
+            We have already received the payment for this order.
           </div>
-          <div class="d-flex justify-space-between py-1">
-            <span>Surge Charge</span><span>{{ formatCurrency(extendResponse.surgeCharge) }}</span>
+        </div>
+
+        <v-divider />
+
+        <div class="pa-4">
+          <div class="d-flex align-start justify-space-between ga-2 mb-3">
+            <div>
+              <div class="text-caption text-medium-emphasis">New End Date</div>
+              <div class="font-weight-bold">{{ extendResponse.newEndDate }}</div>
+            </div>
+            <v-chip color="success" variant="tonal" size="small" label prepend-icon="mdi-check">
+              Paid
+            </v-chip>
           </div>
-          <div class="d-flex justify-space-between py-1">
-            <span>Adjusted Discount</span
-            ><span>{{ formatCurrency(extendResponse.adjustedDiscount) }}</span>
+
+          <div class="border rounded-lg pa-3 text-body-2">
+            <div
+              v-for="row in breakupRows"
+              :key="row.label"
+              class="d-flex justify-space-between py-1"
+            >
+              <span class="text-medium-emphasis">{{ row.label }}</span>
+              <span>{{ formatCurrency(row.value) }}</span>
+            </div>
           </div>
-          <div class="d-flex justify-space-between py-1">
-            <span>Penalty Charge</span
-            ><span>{{ formatCurrency(extendResponse.penaltyCharge) }}</span>
+
+          <div class="d-flex align-center justify-space-between mt-4">
+            <span class="text-caption text-medium-emphasis">Paid Amount</span>
+            <span class="text-h5 font-weight-bold text-success">
+              {{ formatCurrency(extendResponse.amount) }}
+            </span>
           </div>
-          <div class="d-flex justify-space-between py-1">
-            <span>Coupon Discount</span
-            ><span>{{ formatCurrency(extendResponse.couponDiscount) }}</span>
-          </div>
-          <v-divider class="my-2" />
-          <div class="d-flex justify-space-between py-1 font-weight-bold">
-            <span>Paid Amount</span><span>{{ formatCurrency(extendResponse.amount) }}</span>
-          </div>
-        </v-card>
-      </div>
+        </div>
+      </v-card>
 
       <!-- Awaiting payment -->
-      <div v-else>
-        <div class="text-caption text-medium-emphasis">New End Date</div>
-        <div class="font-weight-bold mb-2">{{ extendResponse.newEndDate }}</div>
-        <v-divider class="mb-2" />
-        <div class="d-flex justify-space-between py-1 font-weight-bold">
-          <span>Payable Amount</span><span>{{ formatCurrency(extendResponse.amount) }}</span>
-        </div>
-        <v-btn variant="text" color="primary" class="pl-0" @click="showBreakup = !showBreakup">
-          View Breakup
-        </v-btn>
-        <v-card v-if="showBreakup" variant="outlined" class="pa-3 mb-3">
-          <div class="d-flex justify-space-between py-1">
-            <span>Rental</span><span>{{ formatCurrency(extendResponse.rentalAmount) }}</span>
+      <div v-else class="d-flex flex-column ga-4">
+        <!-- Summary -->
+        <v-card variant="outlined" rounded="lg" class="pa-4">
+          <div class="d-flex align-start justify-space-between ga-2">
+            <div>
+              <div class="text-caption text-medium-emphasis">New End Date</div>
+              <div class="font-weight-bold">{{ extendResponse.newEndDate }}</div>
+            </div>
+            <v-chip color="warning" variant="tonal" size="small" label>Awaiting payment</v-chip>
           </div>
-          <div class="d-flex justify-space-between py-1">
-            <span>Surge Charge</span><span>{{ formatCurrency(extendResponse.surgeCharge) }}</span>
+
+          <v-divider class="my-3" />
+
+          <div class="d-flex align-center justify-space-between ga-2">
+            <div>
+              <div class="text-caption text-medium-emphasis">Payable Amount</div>
+              <div class="text-h5 font-weight-bold">
+                {{ formatCurrency(extendResponse.amount) }}
+              </div>
+            </div>
+            <v-btn
+              variant="text"
+              color="primary"
+              size="small"
+              :append-icon="showBreakup ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              @click="showBreakup = !showBreakup"
+            >
+              {{ showBreakup ? 'Hide' : 'View' }} Breakup
+            </v-btn>
           </div>
-          <div class="d-flex justify-space-between py-1">
-            <span>Adjusted Discount</span
-            ><span>{{ formatCurrency(extendResponse.adjustedDiscount) }}</span>
-          </div>
-          <div class="d-flex justify-space-between py-1">
-            <span>Penalty Charge</span
-            ><span>{{ formatCurrency(extendResponse.penaltyCharge) }}</span>
-          </div>
-          <div class="d-flex justify-space-between py-1">
-            <span>Coupon Discount</span
-            ><span>{{ formatCurrency(extendResponse.couponDiscount) }}</span>
-          </div>
+
+          <v-expand-transition>
+            <div v-if="showBreakup" class="border rounded-lg pa-3 mt-3 text-body-2">
+              <div
+                v-for="row in breakupRows"
+                :key="row.label"
+                class="d-flex justify-space-between py-1"
+              >
+                <span class="text-medium-emphasis">{{ row.label }}</span>
+                <span>{{ formatCurrency(row.value) }}</span>
+              </div>
+            </div>
+          </v-expand-transition>
         </v-card>
 
-        <v-card
+        <!-- Existing payment link -->
+        <v-alert
           v-if="extendResponse.paymentLinkData"
-          variant="outlined"
-          class="my-4 pa-4"
-          style="border-color: rgb(var(--v-theme-success))"
+          type="success"
+          variant="tonal"
+          rounded="lg"
+          icon="mdi-link-variant"
         >
-          <div class="font-weight-bold mb-1">Payment Link Already Created</div>
-          <div class="text-truncate">{{ extendResponse.paymentLinkData.link }}</div>
-          <v-divider class="my-2" />
-          <div class="text-caption text-medium-emphasis">
-            Link expires on {{ formatFullDate(extendResponse.paymentLinkData.expiresOn) }}
+          <div class="font-weight-bold">Payment link already created</div>
+          <div class="text-body-2 text-truncate">{{ extendResponse.paymentLinkData.link }}</div>
+          <div class="text-caption mt-1">
+            Expires on {{ formatFullDate(extendResponse.paymentLinkData.expiresOn) }}
           </div>
-          <v-btn variant="text" color="primary" class="pl-0 mt-1" @click="copyLink"
-            >Copy Link</v-btn
+          <v-btn
+            variant="flat"
+            color="success"
+            size="small"
+            rounded="lg"
+            prepend-icon="mdi-content-copy"
+            class="mt-2"
+            @click="copyLink"
           >
-        </v-card>
+            Copy Link
+          </v-btn>
+        </v-alert>
 
-        <v-list class="my-4" density="comfortable" lines="one" variant="outlined" rounded="lg">
-          <v-list-item
-            :disabled="Boolean(extendResponse.paymentLinkData) || sending"
-            title="Send Payment Link — Cashfree"
-            @click="sendLinkCashfree"
-          />
-          <v-divider />
-          <v-list-item
-            :disabled="Boolean(extendResponse.paymentLinkData) || sending"
-            title="Send Payment Link — Razorpay"
-            @click="sendLinkRazorpay"
-          />
-          <v-divider />
-          <v-list-item title="Update as Cash" @click="openCashDialog" />
-        </v-list>
-
-        <v-btn variant="tonal" @click="load">Refresh</v-btn>
-
-        <v-card variant="outlined" class="mt-4 pa-4">
-          <div class="font-weight-medium mb-2">Resend via another channel</div>
-          <div class="d-flex ga-2 mb-2">
-            <v-text-field
-              v-model="altWhatsapp"
-              label="WhatsApp number"
-              density="compact"
-              hide-details
-            />
-            <v-btn @click="sendAlternate('whatsapp')">Send</v-btn>
+        <!-- Collect payment -->
+        <div>
+          <div class="d-flex align-center justify-space-between mb-2">
+            <div class="text-subtitle-2 font-weight-bold">Collect payment</div>
+            <v-btn
+              variant="text"
+              size="small"
+              prepend-icon="mdi-refresh"
+              :loading="loading"
+              @click="load"
+            >
+              Refresh
+            </v-btn>
           </div>
-          <div class="d-flex ga-2 mb-2">
-            <v-text-field v-model="altPhone" label="SMS number" density="compact" hide-details />
-            <v-btn @click="sendAlternate('sms')">Send</v-btn>
+          <v-card variant="outlined" rounded="lg">
+            <v-list density="comfortable" class="py-0">
+              <v-list-item
+                :disabled="Boolean(extendResponse.paymentLinkData) || sending"
+                prepend-icon="mdi-link-variant"
+                append-icon="mdi-chevron-right"
+                title="Send payment link — Cashfree"
+                subtitle="Customer pays online via Cashfree"
+                @click="sendLinkCashfree"
+              />
+              <v-divider />
+              <v-list-item
+                :disabled="Boolean(extendResponse.paymentLinkData) || sending"
+                prepend-icon="mdi-link-variant"
+                append-icon="mdi-chevron-right"
+                title="Send payment link — Razorpay"
+                subtitle="Customer pays online via Razorpay"
+                @click="sendLinkRazorpay"
+              />
+              <v-divider />
+              <v-list-item
+                prepend-icon="mdi-cash"
+                append-icon="mdi-chevron-right"
+                title="Update as cash"
+                subtitle="Record a payment collected offline"
+                @click="openCashDialog"
+              />
+            </v-list>
+          </v-card>
+        </div>
+
+        <!-- Resend via another channel -->
+        <v-card variant="outlined" rounded="lg" class="pa-4">
+          <div class="text-subtitle-2 font-weight-bold">Resend via another channel</div>
+          <div class="text-caption text-medium-emphasis mb-3">
+            Send the payment link to a different number or email.
           </div>
-          <div class="d-flex ga-2">
-            <v-text-field v-model="altEmail" label="Email" density="compact" hide-details />
-            <v-btn @click="sendAlternate('email')">Send</v-btn>
+          <div class="d-flex flex-column ga-3">
+            <div class="d-flex align-center ga-2">
+              <v-text-field
+                v-model="altWhatsapp"
+                label="WhatsApp number"
+                type="tel"
+                prepend-inner-icon="mdi-whatsapp"
+                density="compact"
+                hide-details
+              />
+              <v-btn
+                color="primary"
+                variant="tonal"
+                rounded="lg"
+                height="40"
+                :disabled="!altWhatsapp"
+                @click="sendAlternate('whatsapp')"
+              >
+                Send
+              </v-btn>
+            </div>
+            <div class="d-flex align-center ga-2">
+              <v-text-field
+                v-model="altPhone"
+                label="SMS number"
+                type="tel"
+                prepend-inner-icon="mdi-message-text-outline"
+                density="compact"
+                hide-details
+              />
+              <v-btn
+                color="primary"
+                variant="tonal"
+                rounded="lg"
+                height="40"
+                :disabled="!altPhone"
+                @click="sendAlternate('sms')"
+              >
+                Send
+              </v-btn>
+            </div>
+            <div class="d-flex align-center ga-2">
+              <v-text-field
+                v-model="altEmail"
+                label="Email"
+                type="email"
+                prepend-inner-icon="mdi-email-outline"
+                density="compact"
+                hide-details
+              />
+              <v-btn
+                color="primary"
+                variant="tonal"
+                rounded="lg"
+                height="40"
+                :disabled="!altEmail"
+                @click="sendAlternate('email')"
+              >
+                Send
+              </v-btn>
+            </div>
           </div>
         </v-card>
       </div>
@@ -267,18 +392,38 @@ async function confirmCashPayment() {
           <v-select
             v-model="cashForm.method"
             label="Paid by *"
+            variant="outlined"
+            rounded="lg"
             :items="CASH_METHOD_OPTIONS"
             @update:model-value="onCashMethodChange"
           />
-          <v-text-field v-model="cashForm.collectedBy" label="Collected by *" />
-          <v-text-field v-model="cashForm.paymentId" label="Payment ID *" />
-          <v-textarea v-model="cashForm.comment" label="Comment *" rows="2" />
+          <v-text-field
+            v-model="cashForm.collectedBy"
+            label="Collected by *"
+            variant="outlined"
+            rounded="lg"
+          />
+          <v-text-field
+            v-model="cashForm.paymentId"
+            label="Payment ID *"
+            variant="outlined"
+            rounded="lg"
+          />
+          <v-textarea
+            v-model="cashForm.comment"
+            label="Comment *"
+            rows="2"
+            variant="outlined"
+            rounded="lg"
+          />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="cashDialog = false">Cancel</v-btn>
+          <v-btn variant="text" rounded="lg" @click="cashDialog = false">Cancel</v-btn>
           <v-btn
             color="primary"
+            variant="flat"
+            rounded="lg"
             :disabled="
               !cashForm.method || !cashForm.collectedBy || !cashForm.paymentId || !cashForm.comment
             "
@@ -300,9 +445,17 @@ async function confirmCashPayment() {
           </v-alert>
         </v-card-text>
         <v-card-actions>
-          <v-btn variant="outlined" color="error" @click="cashConfirmDialog = false">Cancel</v-btn>
           <v-spacer />
-          <v-btn color="primary" :loading="confirming" @click="confirmCashPayment">Confirm</v-btn>
+          <v-btn variant="flat" rounded="lg" @click="cashConfirmDialog = false">Cancel</v-btn>
+
+          <v-btn
+            color="primary"
+            variant="flat"
+            rounded="lg"
+            :loading="confirming"
+            @click="confirmCashPayment"
+            >Confirm</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
