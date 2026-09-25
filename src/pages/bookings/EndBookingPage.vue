@@ -249,7 +249,14 @@ onMounted(loadBooking)
 
     <v-card class="mt-4 pa-4">
       <div class="text-caption text-medium-emphasis mb-2">Step: {{ currentStage }}/10</div>
-      <v-alert v-if="feedbackMessage" type="error" variant="tonal" density="compact" class="mb-3">
+      <v-alert
+        v-if="feedbackMessage"
+        type="error"
+        rounded="lg"
+        variant="tonal"
+        density="compact"
+        class="mb-3"
+      >
         {{ feedbackMessage }}
       </v-alert>
 
@@ -272,6 +279,7 @@ onMounted(loadBooking)
           type="success"
           variant="tonal"
           class="mb-3"
+          rounded="lg"
           :icon="false"
         >
           A 4-digit 'Drop PIN' has already been generated for this user. Please request the customer
@@ -302,11 +310,13 @@ onMounted(loadBooking)
           v-model="customerReceivedDropPIN"
           label="The customer has received the 'DROP PIN' and wishes to end the booking."
           density="compact"
+          hide-details
         />
         <v-checkbox
           v-model="absconding"
           label="The customer is in absconding/recovery status."
           density="compact"
+          hide-details
         />
 
         <div class="text-right mt-4">
@@ -402,7 +412,7 @@ onMounted(loadBooking)
           </v-col>
         </v-row>
         <div class="text-right mt-4">
-          <v-btn color="success" @click="currentStage++">Next</v-btn>
+          <v-btn rounded="lg" color="success" @click="currentStage++">Next</v-btn>
         </div>
       </div>
 
@@ -424,14 +434,16 @@ onMounted(loadBooking)
             </div>
           </v-alert>
         </template>
-        <v-alert v-else type="error" variant="tonal" class="mt-2">
+        <v-alert v-else :icon="false" type="error" variant="tonal" rounded="lg" class="mt-2">
           <div>No penalties have been detected.</div>
           <div class="mt-2">
-            <v-btn size="small" color="warning" @click="adjustPenaltyModal = true">Adjust</v-btn>
+            <v-btn rounded="lg" size="small" color="warning" @click="adjustPenaltyModal = true"
+              >Adjust</v-btn
+            >
           </div>
         </v-alert>
         <div class="text-right mt-4">
-          <v-btn color="success" @click="currentStage++">Skip &gt;&gt;</v-btn>
+          <v-btn rounded="lg" color="success" @click="currentStage++">Skip &gt;&gt;</v-btn>
         </div>
       </div>
 
@@ -440,14 +452,14 @@ onMounted(loadBooking)
         <h3 class="text-h6 mb-4">Traffic Violations</h3>
         <TrafficViolationsList :booking-id="bookingData.bookingId" />
         <div class="text-right mt-4">
-          <v-btn color="success" @click="currentStage++">Next &gt;&gt;</v-btn>
+          <v-btn rounded="lg" color="success" @click="currentStage++">Next &gt;&gt;</v-btn>
         </div>
       </div>
 
       <!-- Step 7: payment ticket -->
       <div v-else-if="currentStage === 7">
         <h3 class="text-h6 mb-4">Payment Ticket</h3>
-        <v-alert type="warning" variant="tonal" class="mb-3">
+        <v-alert rounded="lg" :icon="false" type="warning" variant="tonal" class="mb-3">
           If there is any pending amount with the customer, please add it here. If the customer has
           a due amount, remember a separate team is allocated to deal with this.
           <div class="mt-1">
@@ -456,7 +468,7 @@ onMounted(loadBooking)
         </v-alert>
         <PaymentTicketsTab :booking-id="bookingData.bookingId" />
         <div class="text-right mt-4">
-          <v-btn color="success" @click="currentStage++">Next &gt;&gt;</v-btn>
+          <v-btn rounded="lg" color="success" @click="currentStage++">Next &gt;&gt;</v-btn>
         </div>
       </div>
 
@@ -468,18 +480,20 @@ onMounted(loadBooking)
           label="Forcefully Recovered"
           color="primary"
           density="compact"
+          hide-details
         />
         <v-switch
           v-model="blacklist"
           label="Blacklist Customer"
           color="primary"
           density="compact"
+          hide-details
         />
         <v-btn variant="text" color="primary" class="pl-0" @click="recoveryInfoModal = true">
           Click for more info
         </v-btn>
         <div class="text-right mt-4">
-          <v-btn color="success" @click="currentStage++">Next &gt;&gt;</v-btn>
+          <v-btn rounded="lg" color="success" @click="currentStage++">Next &gt;&gt;</v-btn>
         </div>
       </div>
 
@@ -487,38 +501,70 @@ onMounted(loadBooking)
       <div v-else-if="currentStage === 9">
         <div class="d-flex justify-space-between align-center mb-2">
           <h3 class="text-h6">Verify Drop</h3>
-          <v-btn size="small" color="warning" @click="sendLinkToCustomerModal = true"
+          <v-btn size="small" rounded="lg" color="warning" @click="sendLinkToCustomerModal = true"
             >Send PIN Link</v-btn
           >
         </div>
 
         <template v-if="!absconding">
-          <v-alert type="info" variant="tonal" class="my-3">
+          <v-alert :icon="false" rounded="lg" type="info" variant="tonal" class="my-3">
             Please enter the 4-digit 'Drop PIN' that was generated for this user during the first
             step. The booking will only be completed with a valid PIN.
           </v-alert>
           <v-text-field v-model="otp" label="Enter 4-digit DROP PIN" />
         </template>
-        <v-alert v-else type="error" variant="tonal" class="my-3">
+        <v-alert v-else type="error" rounded="lg" variant="tonal" class="my-3">
           You have marked this as an absconding/recovery case, you are not required to enter the
           Drop Pin here, please add complete brief before closing.
-          <v-textarea v-model="bookingEndComment" placeholder="enter comment" class="mt-2" />
+          <v-textarea
+            v-model="bookingEndComment"
+            placeholder="enter comment"
+            variant="outlined"
+            rounded="lg"
+            class="mt-2"
+          />
           <div class="mt-2">If you think there is a mistake please click on the button below.</div>
-          <v-btn color="error" class="mt-2" @click="currentStage = 1">Start Over</v-btn>
+          <v-btn rounded="lg" color="error" class="mt-2" @click="currentStage = 1"
+            >Start Over</v-btn
+          >
         </v-alert>
 
         <div class="text-right mt-4">
-          <v-btn color="success" :loading="confirming" @click="confirmEndBooking"
+          <v-btn rounded="lg" color="success" :loading="confirming" @click="confirmEndBooking"
             >Confirm &amp; End Booking</v-btn
           >
         </div>
       </div>
 
       <!-- Step 10: done -->
-      <div v-else class="text-center py-6">
-        <v-icon icon="mdi-check-circle" color="success" size="48" class="mb-3" />
-        <div class="font-weight-bold mb-4">Booking Ended</div>
-        <v-btn :to="{ name: 'bookings' }" color="success">Go Back to Bookings</v-btn>
+      <div v-else class="text-center py-8 px-2 mx-auto" style="max-width: 420px">
+        <v-avatar color="success" variant="tonal" size="72" class="mb-4">
+          <v-icon icon="mdi-check-circle" size="44" />
+        </v-avatar>
+        <div class="text-h6 font-weight-bold">Booking Ended</div>
+        <div class="text-body-2 text-medium-emphasis mb-5">
+          Booking {{ bookingData?.bookingId ?? bookingId }} has been closed successfully.
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row justify-center ga-3">
+          <v-btn
+            :to="{ name: 'booking-detail', params: { bookingId } }"
+            variant="outlined"
+            rounded="lg"
+            prepend-icon="mdi-file-document-outline"
+          >
+            View Booking
+          </v-btn>
+          <v-btn
+            :to="{ name: 'bookings' }"
+            color="primary"
+            variant="flat"
+            rounded="lg"
+            prepend-icon="mdi-arrow-left"
+          >
+            Back to Bookings
+          </v-btn>
+        </div>
       </div>
     </v-card>
 
@@ -534,12 +580,19 @@ onMounted(loadBooking)
             <code>https://book.on-track.in/feedback/{{ bookingData.bookingId }}</code>
           </div>
           <div class="d-flex ga-2 mt-4">
-            <v-btn color="success" :loading="sendingLink" @click="sendOTPGenerationLink">
+            <v-btn
+              rounded="lg"
+              color="success"
+              :loading="sendingLink"
+              @click="sendOTPGenerationLink"
+            >
               Send SMS{{
                 bookingData.customerData?.fName ? ` to ${bookingData.customerData.fName}` : ''
               }}
             </v-btn>
-            <v-btn color="success" variant="tonal" @click="copyDropPinLink">Copy Link</v-btn>
+            <v-btn rounded="lg" color="success" variant="tonal" @click="copyDropPinLink"
+              >Copy Link</v-btn
+            >
           </div>
         </v-card-text>
       </v-card>
@@ -551,7 +604,9 @@ onMounted(loadBooking)
         <v-card-text>
           <v-img v-if="imagePreview" :src="imagePreview" />
           <div v-if="imagePreview" class="text-right mt-3">
-            <v-btn color="success" :loading="uploadingImage" @click="confirmUpload">Confirm</v-btn>
+            <v-btn rounded="lg" color="success" :loading="uploadingImage" @click="confirmUpload"
+              >Confirm</v-btn
+            >
           </div>
           <div v-else>Please select an image first.</div>
         </v-card-text>
@@ -566,12 +621,21 @@ onMounted(loadBooking)
             v-model.number="penaltyCharge"
             type="number"
             label="How much is the penalty?"
+            hide-details
           />
         </v-card-text>
         <v-card-actions>
-          <v-btn variant="outlined" @click="adjustPenaltyModal = false">Cancel</v-btn>
           <v-spacer />
-          <v-btn color="primary" :loading="savingPenalty" @click="updatePenalty">Save</v-btn>
+          <v-btn rounded="lg" @click="adjustPenaltyModal = false">Cancel</v-btn>
+
+          <v-btn
+            rounded="lg"
+            variant="flat"
+            color="primary"
+            :loading="savingPenalty"
+            @click="updatePenalty"
+            >Save</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>

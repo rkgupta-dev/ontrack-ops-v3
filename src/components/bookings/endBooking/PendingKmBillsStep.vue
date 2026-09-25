@@ -108,7 +108,7 @@ async function createBill() {
     </v-card>
 
     <v-card v-if="canProceed && !loading" variant="outlined" class="pa-4 text-center mb-3">
-      <div class="text-h6">No pending KM Bill.</div>
+      <div class="text-h6">No Pending KM Bill.</div>
     </v-card>
 
     <div class="text-right mt-4">
