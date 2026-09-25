@@ -264,14 +264,25 @@ async function createBooking() {
               <div class="text-medium-emphasis">{{ selectedCustomer.mobile }}</div>
               <div class="text-medium-emphasis">{{ selectedCustomer.email }}</div>
               <div class="text-medium-emphasis">{{ selectedCustomer.address }}</div>
-              <v-btn variant="text" color="primary" class="pl-0 mt-1" @click="reset"
-                >change customer</v-btn
+              <v-btn
+                variant="tonal"
+                size="small"
+                color="secondary"
+                rounded="lg"
+                class="mt-1"
+                @click="reset"
+                >Change Customer</v-btn
               >
             </v-col>
             <v-col cols="12" md="3" class="text-md-right">
               <v-menu>
                 <template #activator="{ props: menuProps }">
-                  <v-btn color="primary" :disabled="isEligibleToBook" v-bind="menuProps">
+                  <v-btn
+                    rounded="lg"
+                    color="primary"
+                    :disabled="isEligibleToBook"
+                    v-bind="menuProps"
+                  >
                     {{ isEligibleToBook ? 'Already Booked' : 'Create Booking' }}
                   </v-btn>
                 </template>
@@ -295,7 +306,9 @@ async function createBooking() {
               <div>{{ b.customerData?.fName }} {{ b.customerData?.lName }}</div>
               <div class="text-caption text-medium-emphasis">{{ formatFullDate(b.createdAt) }}</div>
             </div>
-            <v-btn size="small" @click="viewBooking(b.bookingId)">View/Modify</v-btn>
+            <v-btn color="primary" variant="tonal" rounded="lg" @click="viewBooking(b.bookingId)"
+              >View/Modify</v-btn
+            >
           </div>
         </v-card>
         <EmptyState

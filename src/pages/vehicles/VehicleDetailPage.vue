@@ -382,14 +382,27 @@ async function submitResale() {
             type="number"
             label="Miscellaneous Charge"
           />
-          <v-textarea v-model="resaleForm.about" label="About" rows="3" />
+          <v-textarea
+            v-model="resaleForm.about"
+            label="About"
+            rows="3"
+            variant="outlined"
+            rounded="lg"
+          />
           <v-switch v-model="resaleForm.isForSale" color="primary" label="Add to Resale" />
           <v-text-field :model-value="formatCurrency(totalPrice)" label="Total Price" readonly />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="resaleDialog = false">Cancel</v-btn>
-          <v-btn color="primary" :loading="savingResale" @click="submitResale">Submit</v-btn>
+          <v-btn variant="text" rounded="lg" @click="resaleDialog = false">Cancel</v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            rounded="lg"
+            :loading="savingResale"
+            @click="submitResale"
+            >Submit</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>

@@ -110,7 +110,15 @@ onMounted(() => {
     <v-expand-transition>
       <div v-if="showStats">
         <div v-if="loading && rows.length === 0" class="d-flex ga-3 mb-4" style="overflow-x: auto">
-          <v-skeleton-loader v-for="n in 6" :key="n" type="card" width="150" height="100" />
+          <v-skeleton-loader
+            v-for="n in 8"
+            :key="n"
+            type="text, text"
+            width="160"
+            height="90"
+            class="flex-shrink-0 border rounded-lg"
+            style="min-width: 160px"
+          />
         </div>
         <div v-else-if="!error" class="d-flex ga-3 mb-4 pb-1" style="overflow-x: auto">
           <v-card

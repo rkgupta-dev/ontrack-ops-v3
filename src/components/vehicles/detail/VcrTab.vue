@@ -55,7 +55,7 @@ const CHECKLIST = [
   </div>
   <EmptyState v-else-if="!vcr" icon="mdi-clipboard-text-off-outline" title="No records found" />
   <div v-else>
-    <v-alert type="info" variant="tonal" density="compact" class="mb-4">
+    <v-alert :icon="false" rounded="lg" type="info" variant="tonal" density="compact" class="mb-4">
       This section is read-only — it only shows the vehicle condition report.
     </v-alert>
     <v-row>
