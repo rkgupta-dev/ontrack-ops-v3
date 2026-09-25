@@ -16,7 +16,7 @@ import BookingHistoryTab from '../../components/vehicles/detail/BookingHistoryTa
 import ServiceHistoryTab from '../../components/vehicles/detail/ServiceHistoryTab.vue'
 import VcrTab from '../../components/vehicles/detail/VcrTab.vue'
 import ActivitiesTab from '../../components/bookings/detail/ActivitiesTab.vue'
-import VehicleCollectionTab from '../../components/vehicles/detail/VehicleCollectionTab.vue'
+import PaymentsTab from '../../components/bookings/detail/PaymentsTab.vue'
 import VehicleLiveLocation from '../../components/vehicles/detail/VehicleLiveLocation.vue'
 
 const route = useRoute()
@@ -40,6 +40,14 @@ async function load() {
   }
 }
 onMounted(load)
+// Same component is reused when navigating vehicle → vehicle (e.g. the
+// "Exchanged with" link in the Collection tab), so reload on param change.
+watch(
+  () => route.params.vehicleId,
+  (id, oldId) => {
+    if (id && id !== oldId) load()
+  },
+)
 
 const isSwapKeyBlocked = computed(() => Boolean(vehicle.value?.swapKeyStatus?.blocked))
 
@@ -304,16 +312,14 @@ async function submitResale() {
       </v-tabs>
     </v-card>
 
-    <v-window v-model="tab">
+    <v-window :key="vehicle.id" v-model="tab">
       <v-window-item value="specs"><SpecsTab :vehicle="vehicle" /></v-window-item>
       <v-window-item value="service"><ServiceHistoryTab :vehicle-id="vehicle.id" /></v-window-item>
       <v-window-item value="settings"><SettingsTab :vehicle="vehicle" /></v-window-item>
       <v-window-item value="bookings"><BookingHistoryTab :vehicle-id="vehicle.id" /></v-window-item>
       <v-window-item value="vcr"><VcrTab :vehicle-id="vehicle.id" /></v-window-item>
       <v-window-item value="activities"><ActivitiesTab :booking-id="vehicle.id" /></v-window-item>
-      <v-window-item value="collection"
-        ><VehicleCollectionTab :vehicle-id="vehicle.id"
-      /></v-window-item>
+      <v-window-item value="collection"><PaymentsTab :vehicle-id="vehicle.id" /></v-window-item>
     </v-window>
 
     <!-- Resale detail (read-only, sold vehicles) -->

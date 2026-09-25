@@ -7,8 +7,12 @@ import { formatCurrency } from '../../../utils/currency'
 import { formatFullDate, toPaymentReceivedOn } from '../../../utils/date'
 import EmptyState from '../../common/EmptyState.vue'
 
+// Scoped to either a booking (Booking Detail's Payments tab) or a vehicle
+// (Vehicle Detail's Collection tab) — same list/LTV/view UI for both.
+// Adding a collection needs a bookingId, so it's booking-scope only.
 const props = defineProps({
-  bookingId: { type: [String, Number], required: true },
+  bookingId: { type: [String, Number], default: null },
+  vehicleId: { type: [String, Number], default: null },
 })
 
 const uiStore = useUiStore()
@@ -67,6 +71,7 @@ async function load(reset = false) {
   try {
     const result = await collectionsApi.fetchCollections({
       bookingId: props.bookingId,
+      vehicleId: props.vehicleId,
       page: page.value,
       paymentStatus: statusFilter.value,
     })
@@ -176,6 +181,10 @@ function openView(row) {
   viewDialog.value = true
 }
 
+// Exchange image preview (shown in-app — opening the storage URL directly
+// downloads the file instead of displaying it)
+const exchangeImageDialog = ref(false)
+
 // Lifetime-value dialog
 const ltvDialog = ref(false)
 
@@ -200,7 +209,7 @@ onMounted(() => load(true))
         <v-btn variant="tonal" rounded="lg" color="success" @click="ltvDialog = true">
           LTV {{ formatCurrency(Math.round(lifetimeValue)) }}
         </v-btn>
-        <v-btn variant="tonal" rounded="lg" color="primary" @click="openAddDialog"
+        <v-btn v-if="bookingId" variant="tonal" rounded="lg" color="primary" @click="openAddDialog"
           >+ Add Collection</v-btn
         >
       </div>
@@ -261,6 +270,15 @@ onMounted(() => load(true))
             c.transactionType?.toLowerCase() === 'credit' ? c.amount : c.refundedAmount,
           )
         }}
+      </div>
+      <div v-if="!bookingId && c.bookingId" class="text-caption mb-1">
+        Booking
+        <router-link
+          :to="{ name: 'booking-detail', params: { bookingId: c.bookingId } }"
+          class="text-primary font-weight-bold text-decoration-none"
+          @click.stop
+          >{{ c.bookingId }}</router-link
+        >
       </div>
       <div v-if="c.paymentStatus == 1" class="text-caption text-medium-emphasis">
         Paid by <strong>{{ c.source ?? 'N/A' }}</strong>
@@ -429,9 +447,37 @@ onMounted(() => load(true))
             >
             <v-col cols="6"><strong>Refund Id</strong>: {{ selected.refundId ?? '-' }}</v-col>
             <v-col cols="12"><v-divider class="my-2" /></v-col>
-            <v-col v-if="selected.collectionExchangeHistory" cols="12" class="text-info">
-              Exchanged with
-              {{ selected.collectionExchangeHistory.newVehicleData?.registrationNumber }}
+            <v-col
+              v-if="selected.collectionExchangeHistory"
+              cols="12"
+              class="d-flex align-center flex-wrap ga-2"
+            >
+              <span class="text-info">Exchanged with</span>
+              <router-link
+                v-if="selected.collectionExchangeHistory.newVehicleData?.id"
+                :to="{
+                  name: 'vehicle-detail',
+                  params: { vehicleId: selected.collectionExchangeHistory.newVehicleData.id },
+                }"
+                class="text-primary font-weight-bold text-decoration-none"
+                @click="viewDialog = false"
+              >
+                {{ selected.collectionExchangeHistory.newVehicleData.registrationNumber }}
+              </router-link>
+              <span v-else class="font-weight-medium">
+                {{ selected.collectionExchangeHistory.newVehicleData?.registrationNumber ?? '-' }}
+              </span>
+              <v-btn
+                v-if="selected.collectionExchangeHistory.new_vehicle_image"
+                variant="tonal"
+                color="primary"
+                size="small"
+                rounded="lg"
+                prepend-icon="mdi-image-outline"
+                @click="exchangeImageDialog = true"
+              >
+                View Exchange Image
+              </v-btn>
             </v-col>
             <v-col cols="12"
               ><strong>Payment Received Date:</strong>
@@ -452,8 +498,24 @@ onMounted(() => load(true))
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="viewDialog = false">Close</v-btn>
+          <v-btn variant="text" rounded="lg" @click="viewDialog = false">Close</v-btn>
         </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="exchangeImageDialog" max-width="900">
+      <v-card v-if="selected?.collectionExchangeHistory?.new_vehicle_image" title="Exchange Image">
+        <template #append>
+          <v-btn icon="mdi-close" variant="text" @click="exchangeImageDialog = false" />
+        </template>
+        <v-card-text>
+          <v-img
+            :src="selected.collectionExchangeHistory.new_vehicle_image"
+            alt="Exchange image"
+            max-height="75vh"
+            contain
+          />
+        </v-card-text>
       </v-card>
     </v-dialog>
 

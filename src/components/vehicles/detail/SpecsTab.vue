@@ -363,8 +363,10 @@ async function confirmImageUpload() {
         <v-card-text><v-text-field v-model="rcExpiry" type="date" hide-details /></v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="rcDialog = false">Cancel</v-btn>
+          <v-btn variant="text" rounded="lg" @click="rcDialog = false">Cancel</v-btn>
           <v-btn
+            variant="flat"
+            rounded="lg"
             color="primary"
             :loading="savingField"
             @click="saveField({ RCExpiry: rcExpiry }, () => (rcDialog = false))"
@@ -380,9 +382,11 @@ async function confirmImageUpload() {
         <v-card-text><v-text-field v-model="insuranceDate" type="date" hide-details /></v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="insuranceStartDialog = false">Cancel</v-btn>
+          <v-btn variant="text" rounded="lg" @click="insuranceStartDialog = false">Cancel</v-btn>
           <v-btn
             color="primary"
+            variant="flat"
+            rounded="lg"
             :loading="savingField"
             @click="saveField({ insuranceDate }, () => (insuranceStartDialog = false))"
           >
@@ -399,8 +403,10 @@ async function confirmImageUpload() {
         /></v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="insuranceEndDialog = false">Cancel</v-btn>
+          <v-btn variant="text" rounded="lg" @click="insuranceEndDialog = false">Cancel</v-btn>
           <v-btn
+            variant="flat"
+            rounded="lg"
             color="primary"
             :loading="savingField"
             @click="saveField({ nextInsuranceDate }, () => (insuranceEndDialog = false))"
@@ -416,8 +422,10 @@ async function confirmImageUpload() {
         <v-card-text><v-text-field v-model="permitExpiry" type="date" hide-details /></v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="permitDialog = false">Cancel</v-btn>
+          <v-btn variant="text" rounded="lg" @click="permitDialog = false">Cancel</v-btn>
           <v-btn
+            variant="flat"
+            rounded="lg"
             color="primary"
             :loading="savingField"
             @click="saveField({ permitExpiry }, () => (permitDialog = false))"
