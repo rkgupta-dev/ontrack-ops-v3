@@ -20,7 +20,12 @@ export default defineConfig({
       // decision — an ops tool being offline usually means you can't do
       // your job anyway): precache only the app shell, no API-response
       // caching/runtime caching strategy.
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: [
+        'favicon.ico',
+        'favicon-16x16.png',
+        'favicon-32x32.png',
+        'apple-touch-icon.png',
+      ],
       manifest: {
         name: 'Ontrack Operations',
         short_name: 'Ontrack Ops',
@@ -30,14 +35,8 @@ export default defineConfig({
         background_color: '#F5F7FA',
         theme_color: '#1867C0',
         icons: [
-          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
-          {
-            src: 'maskable-icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
+          { src: 'android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
         ],
       },
       workbox: {

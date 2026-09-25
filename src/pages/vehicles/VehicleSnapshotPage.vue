@@ -52,7 +52,7 @@ function print() {
 
       <v-card class="pa-8 mx-auto snapshot-sheet" max-width="800">
         <div class="d-flex ga-4 align-center">
-          <img src="/public//ontrack_logo.ico" width="60" alt="" />
+          <img src="/android-chrome-192x192.png" width="60" alt="" />
           <div>
             <div class="font-weight-bold">Ontrack Technologies Private Limited</div>
             <div class="text-caption">

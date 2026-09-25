@@ -122,6 +122,13 @@ function clearFilters() {
   })
 }
 
+function toggleStatus(value) {
+  const next = statuses.value.includes(value)
+    ? statuses.value.filter((s) => s !== value)
+    : [...statuses.value, value]
+  load({ page: 1, statuses: next })
+}
+
 const rangeStart = computed(() => (total.value ? (page.value - 1) * limit.value + 1 : 0))
 const rangeEnd = computed(() => Math.min(page.value * limit.value, total.value))
 const pageCount = computed(() => Math.max(1, Math.ceil(total.value / limit.value)))
