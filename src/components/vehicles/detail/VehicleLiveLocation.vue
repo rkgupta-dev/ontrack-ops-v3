@@ -145,7 +145,14 @@ onBeforeUnmount(() => {
       <v-icon icon="mdi-map-marker-off-outline" size="36" class="mb-2" />
       <div v-if="error">
         Couldn't load the live location.
-        <v-btn variant="text" size="small" color="primary" :loading="loading" @click="poll">
+        <v-btn
+          variant="text"
+          rounded="lg"
+          size="small"
+          color="primary"
+          :loading="loading"
+          @click="poll"
+        >
           Retry
         </v-btn>
       </div>

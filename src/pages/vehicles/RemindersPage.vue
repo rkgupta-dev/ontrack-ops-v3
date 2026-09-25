@@ -222,7 +222,6 @@ onMounted(() => load(initialExpiryType))
                 size="small"
                 :color="doc.type === expiryType ? 'error' : 'warning'"
                 variant="tonal"
-                label
               >
                 {{ doc.short }}
                 <span class="d-none d-sm-inline">

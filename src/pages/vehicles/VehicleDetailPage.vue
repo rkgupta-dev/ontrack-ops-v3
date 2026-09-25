@@ -127,7 +127,7 @@ async function submitResale() {
     <!-- Header -->
     <v-row class="mb-2">
       <v-col cols="12" md="7">
-        <h2 class="text-h5 font-weight-medium">{{ vehicle.registrationNumber }}</h2>
+        <h2 class="text-h5 font-weight-bold">{{ vehicle.registrationNumber }}</h2>
         <div class="d-flex ga-2 flex-wrap align-center mt-1 mb-2">
           <v-chip size="x-small" :color="vehicle.gps ? 'success' : undefined" variant="tonal">
             {{ vehicle.gps ? 'GPS Installed' : 'GPS Not Installed' }}
@@ -163,10 +163,10 @@ async function submitResale() {
             <v-icon icon="mdi-key" size="14" start /> Swap Key Blocked
           </v-chip>
         </div>
-        <div class="text-caption text-medium-emphasis">
+        <div class="text-body-2 text-medium-emphasis font-weight-medium">
           Added: {{ formatFullDate(vehicle.modelData?.createdAt) }}
         </div>
-        <div class="text-caption text-medium-emphasis">
+        <div class="text-body-2 text-medium-emphasis font-weight-medium">
           {{ vehicle.modelData?.show === 1 ? 'Visible' : 'Hidden' }}
         </div>
 
@@ -203,7 +203,7 @@ async function submitResale() {
         </v-card>
 
         <div class="mt-3">
-          <div class="font-weight-medium">{{ vehicle.modelData?.name }}</div>
+          <div class="font-weight-bold">{{ vehicle.modelData?.name }}</div>
           <div>
             <span class="text-decoration-line-through text-medium-emphasis">
               {{ formatCurrency(vehicle.modelData?.inflatedPrice) }}
@@ -237,7 +237,7 @@ async function submitResale() {
           Snap
         </v-btn>
       </div>
-      <div class="text-caption text-medium-emphasis mt-2">
+      <div class="text-body-2 text-medium-emphasis mt-2">
         {{ formatFullDate(vehicle.bookingData.createdAt) }}
       </div>
       <!-- Both links open in a new tab so the vehicle page stays put. -->
@@ -251,7 +251,7 @@ async function submitResale() {
         }"
         target="_blank"
         rel="noopener"
-        class="d-block font-weight-medium text-decoration-none"
+        class="d-block font-weight-bold text-decoration-none"
       >
         {{ vehicle.bookingData.customerData?.fName }} {{ vehicle.bookingData.customerData?.lName }}
       </RouterLink>

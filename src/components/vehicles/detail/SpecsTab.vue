@@ -196,42 +196,44 @@ async function confirmImageUpload() {
   <div>
     <v-row>
       <v-col cols="12" md="6">
-        <div class="text-caption text-medium-emphasis">Location</div>
+        <div class="text-body-2 text-medium-emphasis">Location</div>
         <div class="d-flex align-center ga-2">
           <span>{{ vehicle.locationData?.name ?? 'NA' }}</span>
           <v-btn icon="mdi-pencil" size="x-small" variant="outlined" @click="openLocationDialog" />
         </div>
       </v-col>
       <v-col cols="12" md="6">
-        <div class="text-caption text-medium-emphasis">Owner</div>
+        <div class="text-body-2 text-medium-emphasis">Owner</div>
         <div>{{ lessorName(vehicle.lessorData, '—') }}</div>
       </v-col>
 
       <v-col cols="12" md="6">
-        <div class="text-caption text-medium-emphasis">Insurance Policy</div>
+        <div class="text-body-2 text-medium-emphasis">Insurance Policy</div>
         <div>{{ vehicle.InsurancePolicy ?? '—' }}</div>
       </v-col>
       <v-col cols="6" md="3">
-        <div class="text-caption text-medium-emphasis">Insurance Start</div>
+        <div class="text-body-2 text-medium-emphasis">Insurance Start</div>
         <div>{{ formatFullDate(vehicle.insuranceDate) }}</div>
         <v-btn
           variant="text"
           size="small"
           color="primary"
           class="px-0"
+          rounded="lg"
           @click="openInsuranceStartDialog"
         >
           Update
         </v-btn>
       </v-col>
       <v-col cols="6" md="3">
-        <div class="text-caption text-medium-emphasis">Insurance End</div>
+        <div class="text-body-2 text-medium-emphasis">Insurance End</div>
         <div>{{ formatFullDate(vehicle.nextInsuranceDate) }}</div>
         <v-btn
           variant="text"
           size="small"
           color="primary"
           class="px-0"
+          rounded="lg"
           @click="openInsuranceEndDialog"
         >
           Update
@@ -239,27 +241,34 @@ async function confirmImageUpload() {
       </v-col>
 
       <v-col cols="6" md="3">
-        <div class="text-caption text-medium-emphasis">Engine Number</div>
+        <div class="text-body-2 text-medium-emphasis">Engine Number</div>
         <div>{{ vehicle.engineNo ?? '—' }}</div>
       </v-col>
       <v-col cols="6" md="3">
-        <div class="text-caption text-medium-emphasis">Chassis Number</div>
+        <div class="text-body-2 text-medium-emphasis">Chassis Number</div>
         <div>{{ vehicle.chassisNo ?? '—' }}</div>
       </v-col>
       <v-col cols="6" md="3">
-        <div class="text-caption text-medium-emphasis">Manufacture Date</div>
+        <div class="text-body-2 text-medium-emphasis">Manufacture Date</div>
         <div>{{ formatFullDate(vehicle.manufactureDate) }}</div>
       </v-col>
       <v-col cols="6" md="3">
-        <div class="text-caption text-medium-emphasis">RC Expiry</div>
+        <div class="text-body-2 text-medium-emphasis">RC Expiry</div>
         <div>{{ formatFullDate(vehicle.RCExpiry) }}</div>
-        <v-btn variant="text" size="small" color="primary" class="px-0" @click="openRcDialog">
+        <v-btn
+          variant="text"
+          rounded="lg"
+          size="small"
+          color="primary"
+          class="px-0"
+          @click="openRcDialog"
+        >
           Update
         </v-btn>
       </v-col>
 
       <v-col cols="12" md="6">
-        <div class="text-caption text-medium-emphasis">Swap Key ID</div>
+        <div class="text-body-2 text-medium-emphasis">Swap Key ID</div>
         <div class="d-flex align-center ga-2 flex-wrap">
           <span>{{ vehicle.swapKeyId || '-' }}</span>
           <v-chip v-if="vehicle.swapKeyId" size="small" :color="swapKeyStatusInfo.color">
@@ -267,10 +276,17 @@ async function confirmImageUpload() {
             {{ swapKeyStatusInfo.text }}
           </v-chip>
         </div>
-        <div v-if="swapKeyStatusDetails" class="text-caption text-medium-emphasis">
+        <div v-if="swapKeyStatusDetails" class="text-body-2 text-medium-emphasis">
           {{ swapKeyStatusDetails }}
         </div>
-        <v-btn variant="text" size="small" color="primary" class="px-0" @click="openSwapKeyDialog">
+        <v-btn
+          variant="text"
+          rounded="lg"
+          size="small"
+          color="primary"
+          class="px-0"
+          @click="openSwapKeyDialog"
+        >
           Update
         </v-btn>
         <div v-if="vehicle.swapKeyId" class="mt-2">
@@ -301,15 +317,22 @@ async function confirmImageUpload() {
       </v-col>
 
       <v-col cols="6" md="3">
-        <div class="text-caption text-medium-emphasis">Permit Expiry</div>
+        <div class="text-body-2 text-medium-emphasis">Permit Expiry</div>
         <div>{{ formatFullDate(vehicle.permitExpiry) }}</div>
-        <v-btn variant="text" size="small" color="primary" class="px-0" @click="openPermitDialog">
+        <v-btn
+          variant="text"
+          rounded="lg"
+          size="small"
+          color="primary"
+          class="px-0"
+          @click="openPermitDialog"
+        >
           Update
         </v-btn>
       </v-col>
 
       <v-col v-for="(meta, key) in IMAGE_TYPES" :key="key" cols="6" md="3">
-        <div class="text-caption text-medium-emphasis">{{ meta.label }}</div>
+        <div class="text-body-2 text-medium-emphasis">{{ meta.label }}</div>
         <div class="d-flex ga-1">
           <v-btn icon="mdi-pencil" size="x-small" variant="outlined" @click="chooseImage(key)" />
           <v-btn

@@ -69,7 +69,7 @@ function paymentIdOf(b) {
           title="Open customer in Outreach"
         />
       </h3>
-      <div class="d-flex ga-3 text-body-2 mt-1">
+      <div class="d-flex ga-3 text-body-1 mt-1">
         <a
           v-if="booking.customerData?.mobile"
           :href="`tel:${booking.customerData.mobile}`"
@@ -89,9 +89,9 @@ function paymentIdOf(b) {
     </div>
 
     <div class="mb-4">
-      <div class="text-caption text-medium-emphasis">Booking Amount</div>
+      <div class="text-body-2 text-medium-emphasis">Booking Amount</div>
       <div class="d-flex align-center ga-2">
-        <span class="text-h6">{{ formatCurrency(booking.amount) }}</span>
+        <span class="text-h6 font-weight-bold">{{ formatCurrency(booking.amount) }}</span>
         <v-chip v-if="booking.paymentStatus === 1" size="small" color="success" variant="tonal">
           Paid
         </v-chip>
@@ -133,7 +133,7 @@ function paymentIdOf(b) {
 
     <v-divider class="mb-4" />
 
-    <div class="text-caption text-medium-emphasis mb-2">Payment Details</div>
+    <div class="text-body-2 text-medium-emphasis mb-2">Payment Details</div>
     <div class="d-flex justify-space-between py-1">
       <span>Helmet Charge</span>
       <span

@@ -435,7 +435,7 @@ onMounted(() => fetchPage())
               <span v-else>—</span>
             </td>
             <td>
-              <v-chip :color="statusMeta(item.status).color" size="small" variant="flat" label>
+              <v-chip :color="statusMeta(item.status).color" size="small" variant="tonal">
                 {{ statusMeta(item.status).label }}
               </v-chip>
             </td>
@@ -564,7 +564,7 @@ onMounted(() => fetchPage())
         </v-card-text>
         <v-card-actions class="px-6 pb-4">
           <v-spacer />
-          <v-btn variant="text" class="text-none" @click="recoverOpen = false">
+          <v-btn variant="text" rounded="lg" class="text-none" @click="recoverOpen = false">
             {{ selected.status === 0 ? 'Cancel' : 'Close' }}
           </v-btn>
           <v-btn
@@ -573,7 +573,6 @@ onMounted(() => fetchPage())
             variant="flat"
             rounded="lg"
             class="text-none"
-            prepend-icon="mdi-check-circle-outline"
             :disabled="!closingComment.trim()"
             @click="requestClose"
           >

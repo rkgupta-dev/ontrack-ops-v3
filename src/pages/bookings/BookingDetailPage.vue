@@ -248,7 +248,7 @@ const deliveryDialog = ref(false)
         <div class="text-medium-emphasis">{{ booking.modelData?.name ?? 'N/A' }}</div>
         <div
           v-if="booking.vehicleData"
-          class="text-h6 text-primary"
+          class="text-h6 text-primary font-weight-bold"
           style="cursor: pointer"
           @click="goToVehicle"
         >
@@ -265,8 +265,8 @@ const deliveryDialog = ref(false)
         >
           Assign Vehicle
         </v-btn>
-        <div class="text-caption text-medium-emphasis mt-2">Source: {{ booking.source }}</div>
-        <div class="text-caption text-medium-emphasis">{{ formatFullDate(booking.createdAt) }}</div>
+        <div class="text-body-2 text-medium-emphasis mt-2">Source: {{ booking.source }}</div>
+        <div class="text-body-2 text-medium-emphasis">{{ formatFullDate(booking.createdAt) }}</div>
       </v-col>
 
       <v-col cols="12" md="4" class="text-md-right">
@@ -510,7 +510,7 @@ const deliveryDialog = ref(false)
             rows="3"
             rounded="lg"
           />
-          <div class="text-caption text-medium-emphasis">
+          <div class="text-body-2 text-medium-emphasis">
             <strong>Note:</strong> once a booking is reinitiated, it cannot be reverted.
           </div>
         </v-card-text>
@@ -536,12 +536,12 @@ const deliveryDialog = ref(false)
       <v-card title="View Documents">
         <v-card-text>
           <div class="mb-3">
-            <div class="text-caption text-medium-emphasis">DL Number</div>
+            <div class="text-body-2 text-medium-emphasis">DL Number</div>
             <strong>{{ booking.customerData?.DLnumber ?? 'Not Available' }}</strong>
           </div>
           <v-row>
             <v-col v-for="doc in documents" :key="doc.label" cols="6">
-              <div class="text-caption font-weight-bold mb-1">{{ doc.label }}</div>
+              <div class="text-body-2 font-weight-bold mb-1">{{ doc.label }}</div>
               <v-img
                 v-if="doc.src"
                 :src="doc.src"
