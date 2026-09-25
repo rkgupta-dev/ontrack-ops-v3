@@ -360,7 +360,7 @@ async function confirmImageUpload() {
     <!-- Simple single-field update dialogs -->
     <v-dialog v-model="rcDialog" max-width="380">
       <v-card title="Update RC Expiry">
-        <v-card-text><v-text-field v-model="rcExpiry" type="date" /></v-card-text>
+        <v-card-text><v-text-field v-model="rcExpiry" type="date" hide-details /></v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn variant="text" @click="rcDialog = false">Cancel</v-btn>
@@ -377,7 +377,7 @@ async function confirmImageUpload() {
 
     <v-dialog v-model="insuranceStartDialog" max-width="380">
       <v-card title="Update Insurance Start">
-        <v-card-text><v-text-field v-model="insuranceDate" type="date" /></v-card-text>
+        <v-card-text><v-text-field v-model="insuranceDate" type="date" hide-details /></v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn variant="text" @click="insuranceStartDialog = false">Cancel</v-btn>
@@ -394,7 +394,9 @@ async function confirmImageUpload() {
 
     <v-dialog v-model="insuranceEndDialog" max-width="380">
       <v-card title="Update Insurance End">
-        <v-card-text><v-text-field v-model="nextInsuranceDate" type="date" /></v-card-text>
+        <v-card-text
+          ><v-text-field v-model="nextInsuranceDate" type="date" hide-details
+        /></v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn variant="text" @click="insuranceEndDialog = false">Cancel</v-btn>
@@ -411,7 +413,7 @@ async function confirmImageUpload() {
 
     <v-dialog v-model="permitDialog" max-width="380">
       <v-card title="Update Permit Expiry">
-        <v-card-text><v-text-field v-model="permitExpiry" type="date" /></v-card-text>
+        <v-card-text><v-text-field v-model="permitExpiry" type="date" hide-details /></v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn variant="text" @click="permitDialog = false">Cancel</v-btn>
@@ -429,7 +431,7 @@ async function confirmImageUpload() {
     <v-dialog v-model="swapKeyDialog" max-width="380">
       <v-card title="Update Swap Key ID">
         <v-card-text
-          ><v-text-field v-model="swapKeyId" placeholder="Enter Swap Key Id"
+          ><v-text-field v-model="swapKeyId" placeholder="Enter Swap Key Id" hide-details
         /></v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -462,6 +464,7 @@ async function confirmImageUpload() {
             item-value="id"
             variant="outlined"
             rounded="lg"
+            hide-details
           />
         </v-card-text>
         <v-card-actions>
@@ -535,7 +538,11 @@ async function confirmImageUpload() {
         <v-card-text>
           <v-img v-if="imagePreview" :src="imagePreview" />
           <div class="text-right mt-3">
-            <v-btn color="primary" :loading="uploadingImage" @click="confirmImageUpload"
+            <v-btn
+              color="primary"
+              rounded="lg"
+              :loading="uploadingImage"
+              @click="confirmImageUpload"
               >Confirm</v-btn
             >
           </div>

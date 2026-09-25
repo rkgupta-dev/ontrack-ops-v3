@@ -116,6 +116,18 @@ async function confirmReinitiate() {
 
 // --- View documents dialog ---
 const documentsDialog = ref(false)
+// Full-size preview is shown in-app: the document URLs are served as
+// downloads, so linking to them directly downloads instead of viewing.
+const previewDocument = ref(null)
+const documents = computed(() => {
+  const data = booking.value?.customerData
+  return [
+    { label: 'DL Front', src: data?.DLfront },
+    { label: 'DL Back', src: data?.DLback },
+    { label: 'ID Proof', src: data?.idProof },
+    { label: 'ID Proof Back', src: data?.idProofBack },
+  ]
+})
 
 // --- Update payment dialog ---
 const updatePaymentDialog = ref(false)
@@ -528,45 +540,18 @@ const deliveryDialog = ref(false)
             <strong>{{ booking.customerData?.DLnumber ?? 'Not Available' }}</strong>
           </div>
           <v-row>
-            <v-col cols="6">
-              <div class="text-caption font-weight-bold mb-1">DL Front</div>
-              <a
-                v-if="booking.customerData?.DLfront"
-                :href="booking.customerData.DLfront"
-                target="_blank"
-              >
-                <v-img :src="booking.customerData.DLfront" height="160" rounded="lg" cover />
-              </a>
-            </v-col>
-            <v-col cols="6">
-              <div class="text-caption font-weight-bold mb-1">DL Back</div>
-              <a
-                v-if="booking.customerData?.DLback"
-                :href="booking.customerData.DLback"
-                target="_blank"
-              >
-                <v-img :src="booking.customerData.DLback" height="160" rounded="lg" cover />
-              </a>
-            </v-col>
-            <v-col cols="6">
-              <div class="text-caption font-weight-bold mb-1">ID Proof</div>
-              <a
-                v-if="booking.customerData?.idProof"
-                :href="booking.customerData.idProof"
-                target="_blank"
-              >
-                <v-img :src="booking.customerData.idProof" height="160" rounded="lg" cover />
-              </a>
-            </v-col>
-            <v-col cols="6">
-              <div class="text-caption font-weight-bold mb-1">ID Proof Back</div>
-              <a
-                v-if="booking.customerData?.idProofBack"
-                :href="booking.customerData.idProofBack"
-                target="_blank"
-              >
-                <v-img :src="booking.customerData.idProofBack" height="160" rounded="lg" cover />
-              </a>
+            <v-col v-for="doc in documents" :key="doc.label" cols="6">
+              <div class="text-caption font-weight-bold mb-1">{{ doc.label }}</div>
+              <v-img
+                v-if="doc.src"
+                :src="doc.src"
+                :alt="doc.label"
+                height="160"
+                rounded="lg"
+                cover
+                class="cursor-pointer"
+                @click="previewDocument = doc"
+              />
             </v-col>
           </v-row>
           <v-alert :icon="false" type="warning" variant="tonal" density="compact" class="mt-3">
@@ -578,6 +563,27 @@ const deliveryDialog = ref(false)
           <v-spacer />
           <v-btn variant="text" rounded="lg" @click="documentsDialog = false">Close</v-btn>
         </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Full-size document preview -->
+    <v-dialog
+      :model-value="Boolean(previewDocument)"
+      max-width="900"
+      @update:model-value="(open) => !open && (previewDocument = null)"
+    >
+      <v-card v-if="previewDocument" :title="previewDocument.label">
+        <template #append>
+          <v-btn icon="mdi-close" variant="text" @click="previewDocument = null" />
+        </template>
+        <v-card-text>
+          <v-img
+            :src="previewDocument.src"
+            :alt="previewDocument.label"
+            max-height="75vh"
+            contain
+          />
+        </v-card-text>
       </v-card>
     </v-dialog>
 
