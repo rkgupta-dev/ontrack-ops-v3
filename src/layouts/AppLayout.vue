@@ -61,6 +61,8 @@ const userRole = computed(() => authStore.user?.role || null)
 const userInitial = computed(() => userDisplayName.value.trim().charAt(0).toUpperCase() || '?')
 
 // A-019/A-020 — confirmed live response field (2026-09-18): `displayPicture`.
+const appVersion = import.meta.env.VITE_APP_VERSION
+
 const userAvatarUrl = computed(() => authStore.user?.displayPicture || null)
 
 function isActive(name) {
@@ -118,7 +120,13 @@ function handleLogout() {
           </v-avatar>
         </template>
         <v-list-item-title class="font-weight-bold text-no-wrap">
-          {{ userDisplayName }}
+          <router-link
+            :to="{ name: 'profile' }"
+            class="profile-name-link"
+            data-testid="sidebar-profile-link"
+          >
+            {{ userDisplayName }}
+          </router-link>
         </v-list-item-title>
         <v-list-item-subtitle v-if="userRole" class="text-no-wrap text-uppercase text-caption">
           {{ userRole }}
@@ -159,7 +167,7 @@ function handleLogout() {
       location="left"
       width="260"
     >
-      <v-list-item v-if="isHome" class="py-4">
+      <v-list-item class="py-4">
         <template #prepend>
           <v-avatar color="primary" size="36">
             <v-img v-if="userAvatarUrl" :src="userAvatarUrl" :alt="userDisplayName" cover />
@@ -169,18 +177,19 @@ function handleLogout() {
           </v-avatar>
         </template>
         <v-list-item-title class="font-weight-bold text-no-wrap">
-          {{ userDisplayName }}
+          <router-link
+            :to="{ name: 'profile' }"
+            class="profile-name-link"
+            data-testid="sidebar-profile-link"
+            @click="mobileDrawerOpen = false"
+          >
+            {{ userDisplayName }}
+          </router-link>
         </v-list-item-title>
         <v-list-item-subtitle v-if="userRole" class="text-no-wrap text-uppercase text-caption">
           {{ userRole }}
         </v-list-item-subtitle>
       </v-list-item>
-      <v-list-item
-        v-else
-        class="py-4"
-        prepend-avatar="/ontrack_logo.webp"
-        title="Ontrack Operations"
-      />
 
       <v-list nav density="comfortable" class="pa-2">
         <v-list-item
@@ -207,6 +216,10 @@ function handleLogout() {
           @click="handleLogout"
         />
       </v-list>
+
+      <div class="px-4 pb-4 text-caption text-medium-emphasis" data-testid="app-version">
+        Version {{ appVersion }}
+      </div>
     </v-navigation-drawer>
 
     <v-app-bar flat color="background" :class="{ 'app-bar--bordered': showBack }">
@@ -218,8 +231,8 @@ function handleLogout() {
           </button>
           <span v-if="pageTitle" class="text-medium-emphasis ml-2">{{ pageTitle }}</span>
         </template>
-        <v-toolbar-title v-else class="d-flex d-sm-none text-subtitle-1 font-weight-bold">
-          Ontrack
+        <v-toolbar-title v-else class="d-flex d-sm-none align-center">
+          <img src="/ontrack.png" alt="Ontrack" height="20" class="d-block" />
         </v-toolbar-title>
 
         <v-spacer />
@@ -263,10 +276,10 @@ function handleLogout() {
       <button
         type="button"
         class="mobile-bottom-nav__btn"
-        aria-label="More"
-        @click="mobileDrawerOpen = true"
+        :aria-label="mobileDrawerOpen ? 'Close menu' : 'More'"
+        @click="mobileDrawerOpen = !mobileDrawerOpen"
       >
-        <v-icon icon="mdi-menu" />
+        <v-icon :icon="mobileDrawerOpen ? 'mdi-close' : 'mdi-menu'" />
       </button>
       <router-link
         v-for="item in bottomNavItems"
@@ -337,6 +350,15 @@ function handleLogout() {
 </template>
 
 <style scoped>
+.profile-name-link {
+  color: #000;
+  text-decoration: none;
+}
+
+.profile-name-link:hover {
+  color: rgb(var(--v-theme-primary));
+}
+
 /* The outer Vuetify layout wrapper (.v-layout / .v-application) clips
    overflow by design, so v-main needs its own scroll container — without
    this, any page taller than the viewport is silently cut off with no

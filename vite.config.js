@@ -7,7 +7,13 @@ import vuetify from 'vite-plugin-vuetify'
 import { VitePWA } from 'vite-plugin-pwa'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
+import pkg from './package.json'
+
 export default defineConfig({
+  // Exposes package.json's version to the app (shown in the mobile drawer).
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(pkg.version),
+  },
   plugins: [
     vue(),
     // Dev-only helper; its bundled vite-plugin-inspect crashes Vitest's
