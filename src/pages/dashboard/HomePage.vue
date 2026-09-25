@@ -131,7 +131,15 @@ onMounted(() => {
   <div>
     <!-- Fleet inventory stat strip (A-109) -->
     <div v-if="statsLoading" class="d-flex ga-3 mb-6" style="overflow-x: auto">
-      <v-skeleton-loader v-for="n in 6" :key="n" type="card" width="160" height="90" />
+      <v-skeleton-loader
+        v-for="n in 8"
+        :key="n"
+        type="text, text"
+        width="160"
+        height="90"
+        class="flex-shrink-0 border rounded-lg"
+        style="min-width: 160px"
+      />
     </div>
     <EmptyState
       v-else-if="statsError"
