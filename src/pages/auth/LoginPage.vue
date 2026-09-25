@@ -63,7 +63,7 @@ async function handleSubmit() {
 <template>
   <v-card elevation="0" class="pa-2">
     <v-card-item class="text-center pt-6 mb-4">
-      <v-avatar color="primary" size="64" class="mb-4">
+      <v-avatar rounded="lg" color="primary" size="64" class="mb-4">
         <v-img src="/ontrack_logo.webp" alt="Ontrack Operations" cover />
       </v-avatar>
       <v-card-title class="text-h5 font-weight-bold">Ontrack Operations</v-card-title>
