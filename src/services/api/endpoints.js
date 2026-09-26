@@ -137,12 +137,18 @@ export const ENDPOINTS = {
   // --- Assign vehicle (Phase 1) ---
   // A-104 — GET — model stock list, for the model picker
   MODELS_STOCK: 'models/stock',
+  // A-116 — GET — one model's record incl. its `available` stock count
+  // (assign-vehicle review step, `?model_id=`)
+  MODEL_BY_ID: 'operations/getModels',
   // A-152 — POST (used for a read) — available vehicles for a model
   AVAILABLE_VEHICLES: 'operations/getVehicles',
   // A-030 — POST — pre-booking data (images/KM/address), query: id
   PRE_BOOKING_DATA: '/operations/preBookingData/',
   // A-034 — POST — the actual vehicle assignment
   ASSIGN_VEHICLE: (bookingId) => `booking/${bookingId}/vehicle/assign`,
+  // A-175 — POST — handoff consent: notifies the customer and sends them the
+  // OTP that A-034 then requires
+  ASSIGN_VEHICLE_CONSENT: (bookingId) => `booking/${bookingId}/vehicle/assign/consent`,
 
   // --- Extend booking (Phase 1) ---
   // A-047 — GET — booking summary used to seed the extend screen

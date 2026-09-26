@@ -355,9 +355,10 @@ Functions that fire more than one request. Each of these is a sequential round t
 
 - **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
 - **Purpose:** Submits assign — called from assignVehicle()
-- **Request:** body: <payload.data> (variable — inspect at runtime)
+- **Request:** body: vehicleId, startDate, endDate, status (always `1`), otp (6-digit code from A-175) — per `assignVehicle2.vue::createBooking()`
 - **Response read by frontend:** data (raw)
 - **Used in:** `store.js`
+- **Co-called with:** A-175 (consent/OTP, must precede), A-030 (pre-booking data, first assignment only)
 - **Vuex side effects:** commits `LOADING_API`
 - **Issues:** raw response.data consumed (no envelope)
 
@@ -1646,6 +1647,16 @@ Functions that fire more than one request. Each of these is a sequential round t
 - **Response read by frontend:** (not read, or read indirectly)
 - **Used in:** `views/vehicles/vehicleDetails.vue`
 - **Issues:** not previously documented in this inventory — found while building the v3 Vehicle detail page (Phase 2); added here rather than left undiscovered.
+
+#### `A-175` — `POST booking/:id/vehicle/assign/consent`
+
+- **Backend:** v2 · glacier.on-track.in/api · **Auth:** Bearer agentToken · **Call sites:** 1
+- **Purpose:** Pickup handoff consent — notifies the customer and sends them the 6-digit OTP that A-034 then requires — called from `sendConsent()`
+- **Request:** body: vehicleId, documentsVerified, customerInformed
+- **Response read by frontend:** (not read, or read indirectly)
+- **Used in:** `components/assignVehicle2.vue`
+- **Co-called with:** A-034 (whose body now also carries `otp`), A-030
+- **Issues:** not previously documented in this inventory — found while porting the Assign Vehicle flow (v3 `AssignVehiclePage.vue`); added here rather than left undiscovered.
 
 ### Waitlist
 
