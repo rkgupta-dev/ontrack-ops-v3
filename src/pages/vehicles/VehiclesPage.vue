@@ -9,6 +9,7 @@ import { toUserMessage } from '../../utils/errorMessage'
 import EmptyState from '../../components/common/EmptyState.vue'
 import FilterChecklist from '../../components/common/FilterChecklist.vue'
 import VehicleListCard from '../../components/vehicles/VehicleListCard.vue'
+import VehicleListCardSkeleton from '../../components/vehicles/VehicleListCardSkeleton.vue'
 
 const store = useVehiclesStore()
 const {
@@ -279,8 +280,11 @@ onMounted(() => {
 
         <div class="d-flex align-center justify-space-between mb-3">
           <div class="text-body-2 text-medium-emphasis">
-            <template v-if="total">Showing {{ rangeStart }}-{{ rangeEnd }} of {{ total }}</template>
-            <template v-else-if="!loading">No vehicles found</template>
+            <template v-if="loading">Loading vehicles…</template>
+            <template v-else-if="total">
+              Showing {{ rangeStart }}–{{ rangeEnd }} of {{ total }}
+            </template>
+            <template v-else>No vehicles found</template>
           </div>
           <div>
             <v-btn
@@ -306,8 +310,9 @@ onMounted(() => {
       </EmptyState>
 
       <template v-else>
-        <div v-if="loading && !rows.length" class="d-flex flex-column ga-3">
-          <v-skeleton-loader v-for="n in 4" :key="n" type="card" />
+        <!-- Skeletons on every load, not just the first — see BookingsPage.vue. -->
+        <div v-if="loading" class="d-flex flex-column ga-3" aria-busy="true">
+          <VehicleListCardSkeleton v-for="n in 5" :key="n" />
         </div>
 
         <EmptyState

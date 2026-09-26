@@ -10,6 +10,7 @@ import { BOOKING_HISTORY_FILTERS } from '../../utils/bookingStatus'
 import EmptyState from '../../components/common/EmptyState.vue'
 import FilterChecklist from '../../components/common/FilterChecklist.vue'
 import BookingListCard from '../../components/bookings/BookingListCard.vue'
+import BookingListCardSkeleton from '../../components/bookings/BookingListCardSkeleton.vue'
 
 const store = useBookingsStore()
 const {
@@ -240,8 +241,11 @@ onMounted(() => {
 
         <div class="d-flex align-center justify-space-between mb-3">
           <div class="text-body-2 text-medium-emphasis">
-            <template v-if="total">Showing {{ rangeStart }}-{{ rangeEnd }} of {{ total }}</template>
-            <template v-else-if="!loading">No bookings found</template>
+            <template v-if="loading">Loading bookings…</template>
+            <template v-else-if="total">
+              Showing {{ rangeStart }}–{{ rangeEnd }} of {{ total }}
+            </template>
+            <template v-else>No bookings found</template>
           </div>
           <div>
             <v-btn
@@ -268,8 +272,11 @@ onMounted(() => {
       </EmptyState>
 
       <template v-else>
-        <div v-if="loading && !rows.length" class="d-flex flex-column ga-3">
-          <v-skeleton-loader v-for="n in 4" :key="n" type="card" />
+        <!-- Skeletons on every load (first load, page/filter/search changes),
+             not just when `rows` is empty — otherwise the previous page's
+             cards sit there looking current until the new response lands. -->
+        <div v-if="loading" class="d-flex flex-column ga-3" aria-busy="true">
+          <BookingListCardSkeleton v-for="n in 5" :key="n" />
         </div>
 
         <EmptyState
