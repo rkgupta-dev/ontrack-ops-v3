@@ -98,11 +98,16 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="text-body-2 text-medium-emphasis mb-4">
-      {{ rows.length }} / {{ total }} rows loaded
+      <template v-if="loading">Loading customers…</template>
+      <template v-else-if="!error">{{ rows.length }} / {{ total }} rows loaded</template>
     </div>
 
-    <div v-if="loading" class="d-flex flex-column ga-3">
-      <v-skeleton-loader v-for="n in 4" :key="n" type="card" height="110" />
+    <div v-if="loading" class="d-flex flex-column ga-3" aria-busy="true">
+      <v-card v-for="n in 4" :key="n" variant="outlined" rounded="lg" class="pa-4">
+        <div class="d-flex justify-space-between ga-3">
+          <v-skeleton-loader type="text, text@2" class="flex-grow-1 min-w-0 bg-transparent" />
+        </div>
+      </v-card>
     </div>
 
     <EmptyState

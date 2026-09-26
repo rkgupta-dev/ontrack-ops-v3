@@ -203,8 +203,25 @@ onMounted(() => {
     </div>
 
     <!-- Today's bookings feed (A-046) -->
-    <div v-if="feedLoading" class="d-flex flex-column ga-3">
-      <v-skeleton-loader v-for="n in 3" :key="n" type="card" height="140" />
+    <!-- Shaped like BookingFeedCard.vue: chips + text lines left, image
+         right, divider + date footer. -->
+    <div v-if="feedLoading" class="d-flex flex-column ga-3" aria-busy="true">
+      <v-card v-for="n in 3" :key="n" variant="outlined" rounded="lg" class="pa-4">
+        <div class="d-flex justify-space-between align-center ga-3">
+          <v-skeleton-loader
+            type="chip, heading, text@2"
+            class="flex-grow-1 min-w-0 bg-transparent"
+          />
+          <v-skeleton-loader
+            type="image"
+            :width="$vuetify.display.xs ? 96 : 130"
+            :height="$vuetify.display.xs ? 76 : 100"
+            class="flex-shrink-0 rounded-lg overflow-hidden"
+          />
+        </div>
+        <v-divider />
+        <v-skeleton-loader type="text" width="50%" class="bg-transparent" />
+      </v-card>
     </div>
     <EmptyState
       v-else-if="feedError"
