@@ -14,6 +14,15 @@ const { mobile } = useDisplay()
 // Temporary drawer, mobile only ("More" menu opened from the bottom nav).
 const mobileDrawerOpen = ref(false)
 
+// Mobile bottom nav starts as a floating pill and docks into a full-width
+// bottom sheet once the page is scrolled (v-main is the scroll container —
+// see the `.v-main` style rule). Back to the pill when scrolled to the top.
+const mobileNavDocked = ref(false)
+
+function onMainScroll(event) {
+  mobileNavDocked.value = event.target.scrollTop > 16
+}
+
 // Desktop bottom bar (separate from the always-present left rail above) —
 // collapses down to a single up-arrow that re-expands it, rather than
 // hiding entirely, so there's always something to click to bring it back.
@@ -265,14 +274,18 @@ function handleLogout() {
       </v-container>
     </v-app-bar>
 
-    <v-main class="bg-white" :class="{ 'pb-16': mobile }">
+    <v-main class="bg-white" :class="{ 'pb-16': mobile }" @scroll.passive="onMainScroll">
       <v-container class="pa-4 pa-sm-6">
         <slot />
       </v-container>
     </v-main>
 
     <!-- Mobile: floating bottom nav pill -->
-    <div v-if="mobile" class="mobile-bottom-nav">
+    <div
+      v-if="mobile"
+      class="mobile-bottom-nav"
+      :class="{ 'mobile-bottom-nav--docked': mobileNavDocked }"
+    >
       <button
         type="button"
         class="mobile-bottom-nav__btn"
@@ -424,6 +437,21 @@ function handleLogout() {
   border-radius: 999px;
   background: rgb(var(--v-theme-surface));
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  transition:
+    bottom 0.25s ease,
+    border-radius 0.25s ease,
+    padding 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* Scrolled: dock to the bottom edge as a full-width sheet. */
+.mobile-bottom-nav--docked {
+  bottom: 0;
+  width: 100%;
+  justify-content: space-around;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-bottom-nav__btn {
