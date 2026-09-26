@@ -78,6 +78,12 @@ function isActive(name) {
   return route.name === name
 }
 
+// The bottom bars (mobile pill + desktop bar) only show on the top-level
+// section pages (the ones in the left rail) — detail/sub-pages like a
+// booking's detail or assign-vehicle flow don't get them.
+const baseRouteNames = new Set(navItems.map((item) => item.to.name))
+const isBasePage = computed(() => baseRouteNames.has(route.name))
+
 const isHome = computed(() => route.name === 'home')
 const isStaging = import.meta.env.MODE === 'staging'
 
@@ -249,10 +255,9 @@ function handleLogout() {
         <!-- Only in `--mode staging` builds, so staging is never mistaken for prod. -->
         <v-chip
           v-if="isStaging"
-          color="warning"
-          variant="flat"
+          color="error"
+          variant="tonal"
           size="small"
-          label
           class="font-weight-bold mr-2"
         >
           STAGING
@@ -274,7 +279,11 @@ function handleLogout() {
       </v-container>
     </v-app-bar>
 
-    <v-main class="bg-white" :class="{ 'pb-16': mobile }" @scroll.passive="onMainScroll">
+    <v-main
+      class="bg-white"
+      :class="{ 'pb-16': mobile && isBasePage }"
+      @scroll.passive="onMainScroll"
+    >
       <v-container class="pa-4 pa-sm-6">
         <slot />
       </v-container>
@@ -282,7 +291,7 @@ function handleLogout() {
 
     <!-- Mobile: floating bottom nav pill -->
     <div
-      v-if="mobile"
+      v-if="mobile && isBasePage"
       class="mobile-bottom-nav"
       :class="{ 'mobile-bottom-nav--docked': mobileNavDocked }"
     >
@@ -316,7 +325,7 @@ function handleLogout() {
     <!-- Desktop: bottom bar mirroring the left rail's nav items, with its
          own collapse toggle — independent of the left rail, which stays
          put either way. -->
-    <div v-else>
+    <div v-else-if="!mobile && isBasePage">
       <div v-if="!desktopNavCollapsed" class="desktop-bottom-bar">
         <v-tooltip text="Collapse Menu" location="top">
           <template #activator="{ props: tooltipProps }">
