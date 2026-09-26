@@ -1,9 +1,12 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import * as endBookingApi from '../../../services/bookings/endBooking.api'
+import { useAuthStore } from '../../../stores/auth.store'
 import { useUiStore } from '../../../stores/ui.store'
 import { toUserMessage } from '../../../utils/errorMessage'
 import { formatCurrency } from '../../../utils/currency'
+
+const authStore = useAuthStore()
 
 const props = defineProps({
   bookingId: { type: Number, required: true },
@@ -80,14 +83,17 @@ async function createBill() {
           <span>Amount</span><span>{{ formatCurrency(item.bill.amount) }}</span>
         </div>
         <v-btn
+          v-if="authStore.canViewAdmin"
           class="mt-3"
           size="small"
+          rounded="lg"
           color="primary"
           :href="`https://ontrack-outreach.web.app/km-bills/${item.bill.id}`"
           target="_blank"
         >
           Settle
         </v-btn>
+        <div v-else class="mt-3 text-body-2">Please ask your manager to settle this bill.</div>
       </v-card-text>
       <v-card-text v-else>
         <div class="d-flex justify-space-between py-1">
@@ -103,7 +109,9 @@ async function createBill() {
         <div class="d-flex justify-space-between py-1">
           <span>Amount</span><span>{{ formatCurrency(item.usage.amount) }}</span>
         </div>
-        <v-btn class="mt-3" size="small" color="primary" @click="createBill">Create Bill</v-btn>
+        <v-btn rounded="lg" class="mt-3" size="small" color="primary" @click="createBill"
+          >Create Bill</v-btn
+        >
       </v-card-text>
     </v-card>
 

@@ -3,7 +3,8 @@ import { useAuthStore } from '../stores/auth.store'
 /**
  * Centralized route protection: `meta.requiresAuth` routes require a
  * validated session, `meta.guestOnly` routes (login) redirect an already
- * authenticated agent straight to the app.
+ * authenticated agent straight to the app, and `meta.adminOnly` routes are
+ * hidden from lessor agents (see authStore.canViewAdmin).
  */
 export function attachAuthGuard(router) {
   // Scoped to this guard attachment (one router → one bootstrap), rather
@@ -31,6 +32,16 @@ export function attachAuthGuard(router) {
     }
     if (to.meta.guestOnly && authStore.isAuthenticated) {
       return { name: 'home' }
+    }
+    // Old app's `adminGuard`: lessor agents get the 404 page (URL kept),
+    // not a redirect, so the page doesn't reveal that it exists.
+    if (to.meta.adminOnly && !authStore.canViewAdmin) {
+      return {
+        name: 'not-found',
+        params: { pathMatch: to.path.slice(1).split('/') },
+        query: to.query,
+        hash: to.hash,
+      }
     }
     return true
   })

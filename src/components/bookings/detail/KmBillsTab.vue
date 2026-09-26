@@ -1,10 +1,13 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import * as kmBillsApi from '../../../services/bookings/kmBills.api'
+import { useAuthStore } from '../../../stores/auth.store'
 import { useUiStore } from '../../../stores/ui.store'
 import { toUserMessage } from '../../../utils/errorMessage'
 import { formatFullDate } from '../../../utils/date'
 import EmptyState from '../../common/EmptyState.vue'
+
+const authStore = useAuthStore()
 
 const props = defineProps({
   bookingId: { type: [String, Number], required: true },
@@ -87,6 +90,7 @@ onMounted(load)
 
       <template #[`item.actions`]="{ item }">
         <v-btn
+          v-if="authStore.canViewAdmin"
           rounded="lg"
           size="small"
           variant="tonal"
@@ -96,6 +100,7 @@ onMounted(load)
         >
           Details
         </v-btn>
+        <span v-else class="text-medium-emphasis">Contact Ontrack</span>
       </template>
 
       <template #no-data>

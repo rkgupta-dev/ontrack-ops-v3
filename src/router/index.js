@@ -44,7 +44,7 @@ const routes = [
     path: '/customers/:customerId',
     name: 'customer-detail',
     component: () => import('../pages/customers/CustomerDetailPage.vue'),
-    meta: { layout: 'app', requiresAuth: true, title: 'Customer Detail' },
+    meta: { layout: 'app', requiresAuth: true, adminOnly: true, title: 'Customer Detail' },
   },
   {
     path: '/bookings',
@@ -62,7 +62,7 @@ const routes = [
     path: '/bookings/create/:customerId/dynamic',
     name: 'booking-create-dynamic',
     component: () => import('../pages/bookings/CreateBookingDynamicPage.vue'),
-    meta: { layout: 'app', requiresAuth: true, title: 'Create Booking' },
+    meta: { layout: 'app', requiresAuth: true, adminOnly: true, title: 'Create Booking' },
   },
   {
     path: '/booking/:bookingId',
@@ -159,14 +159,14 @@ const routes = [
     path: '/models',
     name: 'models',
     component: () => import('../pages/models/ModelsPage.vue'),
-    meta: { layout: 'app', requiresAuth: true, title: 'Model List' },
+    meta: { layout: 'app', requiresAuth: true, adminOnly: true, title: 'Model List' },
   },
   {
     // Old-app path kept as-is (camelCase and all) so existing bookmarks work.
     path: '/vehicleStats',
     name: 'vehicle-stats',
     component: () => import('../pages/reports/VehicleStatsPage.vue'),
-    meta: { layout: 'app', requiresAuth: true, title: 'Utilisation Report' },
+    meta: { layout: 'app', requiresAuth: true, adminOnly: true, title: 'Utilisation Report' },
   },
   {
     path: '/recovery',

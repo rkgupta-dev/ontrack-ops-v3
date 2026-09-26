@@ -73,4 +73,43 @@ describe('attachAuthGuard', () => {
 
     expect(authApi.fetchLoggedInUser).toHaveBeenCalledOnce()
   })
+
+  it('shows the 404 page (URL kept) when a lessor agent opens an adminOnly route', async () => {
+    tokenStorage.setToken('valid-token')
+    authApi.fetchLoggedInUser.mockResolvedValue({ name: 'Lessor Agent', role: 'ADMIN', lessor: 1 })
+    const router = createFakeRouter()
+    attachAuthGuard(router)
+
+    const result = await router.run({
+      meta: { requiresAuth: true, adminOnly: true },
+      path: '/customers/42',
+      fullPath: '/customers/42?tab=kyc',
+      query: { tab: 'kyc' },
+      hash: '',
+    })
+
+    expect(result).toEqual({
+      name: 'not-found',
+      params: { pathMatch: ['customers', '42'] },
+      query: { tab: 'kyc' },
+      hash: '',
+    })
+  })
+
+  it('allows an adminOnly route for an Ontrack agent (lessor: null)', async () => {
+    tokenStorage.setToken('valid-token')
+    authApi.fetchLoggedInUser.mockResolvedValue({ name: 'Agent A', lessor: null })
+    const router = createFakeRouter()
+    attachAuthGuard(router)
+
+    const result = await router.run({
+      meta: { requiresAuth: true, adminOnly: true },
+      path: '/models',
+      fullPath: '/models',
+      query: {},
+      hash: '',
+    })
+
+    expect(result).toBe(true)
+  })
 })

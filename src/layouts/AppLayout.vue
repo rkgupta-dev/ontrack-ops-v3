@@ -28,37 +28,56 @@ function onMainScroll(event) {
 // hiding entirely, so there's always something to click to bring it back.
 const desktopNavCollapsed = ref(false)
 
-const navItems = [
+// `adminOnly` items are hidden from lessor agents (authStore.canViewAdmin),
+// same as the old app's side nav (App.vue `show: canViewAdmin`).
+const allNavItems = [
   { to: { name: 'home' }, icon: 'mdi-home-outline', label: 'Home' },
   { to: { name: 'vehicles' }, icon: 'mdi-motorbike', label: 'Vehicles' },
   { to: { name: 'bookings' }, icon: 'mdi-calendar', label: 'Bookings' },
-  { to: { name: 'customers' }, icon: 'mdi-account-group-outline', label: 'Customers' },
+  {
+    to: { name: 'customers' },
+    icon: 'mdi-account-group-outline',
+    label: 'Customers',
+    adminOnly: true,
+  },
   { to: { name: 'stock-count' }, icon: 'mdi-warehouse', label: 'Inventory' },
-  { to: { name: 'models' }, icon: 'mdi-scooter', label: 'Models' },
-  { to: { name: 'vehicle-stats' }, icon: 'mdi-chart-bar', label: 'Utilisation' },
+  { to: { name: 'models' }, icon: 'mdi-scooter', label: 'Models', adminOnly: true },
+  {
+    to: { name: 'vehicle-stats' },
+    icon: 'mdi-chart-bar',
+    label: 'Utilisation',
+    adminOnly: true,
+  },
   { to: { name: 'vehicle-reminders' }, icon: 'mdi-bell-alert-outline', label: 'Expiry Reminder' },
   { to: { name: 'recovery' }, icon: 'mdi-tow-truck', label: 'Recovery' },
   {
     to: { name: 'traffic-attribution' },
     icon: 'mdi-chart-timeline-variant',
     label: 'Traffic Attribution',
+    adminOnly: true,
   },
 ]
+
+const navItems = computed(() =>
+  allNavItems.filter((item) => !item.adminOnly || authStore.canViewAdmin),
+)
 
 // The floating mobile bar / desktop bottom bar only have room for the four
 // primary sections; everything else (Attendance, Inventory, ...) lives
 // behind the "More" icon (mobile) or the left rail only (desktop).
-const bottomNavItems = navItems.filter(
-  (item) =>
-    ![
-      'attendance',
-      'stock-count',
-      'models',
-      'vehicle-stats',
-      'vehicle-reminders',
-      'recovery',
-      'traffic-attribution',
-    ].includes(item.to.name),
+const bottomNavItems = computed(() =>
+  navItems.value.filter(
+    (item) =>
+      ![
+        'attendance',
+        'stock-count',
+        'models',
+        'vehicle-stats',
+        'vehicle-reminders',
+        'recovery',
+        'traffic-attribution',
+      ].includes(item.to.name),
+  ),
 )
 
 const userDisplayName = computed(
@@ -81,7 +100,7 @@ function isActive(name) {
 // The bottom bars (mobile pill + desktop bar) only show on the top-level
 // section pages (the ones in the left rail) — detail/sub-pages like a
 // booking's detail or assign-vehicle flow don't get them.
-const baseRouteNames = new Set(navItems.map((item) => item.to.name))
+const baseRouteNames = new Set(allNavItems.map((item) => item.to.name))
 const isBasePage = computed(() => baseRouteNames.has(route.name))
 
 const isHome = computed(() => route.name === 'home')

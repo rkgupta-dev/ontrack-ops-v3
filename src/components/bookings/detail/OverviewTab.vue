@@ -1,5 +1,8 @@
 <script setup>
+import { useAuthStore } from '../../../stores/auth.store'
 import { formatCurrency } from '../../../utils/currency'
+
+const authStore = useAuthStore()
 
 defineProps({
   booking: { type: Object, required: true },
@@ -52,7 +55,8 @@ function paymentIdOf(b) {
     </div>
 
     <div class="mb-4">
-      <h3 class="text-h6 font-weight-medium d-flex align-center ga-1">
+      <!-- Hidden for lessor agents, as in the old AllBookingDetailsV2.vue. -->
+      <h3 v-if="authStore.canViewAdmin" class="text-h6 font-weight-medium d-flex align-center ga-1">
         {{ booking.customerData?.fName }} {{ booking.customerData?.lName }}
         <!-- Customer's profile in the Outreach app, same host as the KM-bill links. -->
         <v-btn

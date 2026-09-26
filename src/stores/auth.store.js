@@ -11,6 +11,11 @@ export const useAuthStore = defineStore('auth', {
   }),
   getters: {
     isAuthenticated: (state) => Boolean(state.token),
+    // Same rule as the old app's `canViewAdmin` getter (store.js): only
+    // Ontrack's own agents have `lessor: null`; a lessor-scoped agent
+    // carries their lessor id and loses the admin-only pages/sections.
+    // `role` is deliberately ignored — a lessor agent can be role "ADMIN".
+    canViewAdmin: (state) => state.user?.lessor === null,
   },
   actions: {
     /** A-010 login. Throws on failure — the caller (LoginPage) owns the

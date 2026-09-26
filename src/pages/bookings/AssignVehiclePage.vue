@@ -3,11 +3,14 @@ import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import * as bookingDetailApi from '../../services/bookings/bookingDetail.api'
 import * as assignApi from '../../services/bookings/assignVehicle.api'
+import { useAuthStore } from '../../stores/auth.store'
 import { useUiStore } from '../../stores/ui.store'
 import { toUserMessage } from '../../utils/errorMessage'
 import { todayIsoDate, addDaysIso, formatDateOnly, formatFullDate } from '../../utils/date'
 import { formatCurrency } from '../../utils/currency'
 import EmptyState from '../../components/common/EmptyState.vue'
+
+const authStore = useAuthStore()
 
 const route = useRoute()
 const router = useRouter()
@@ -538,7 +541,25 @@ async function confirmAssign() {
           </v-alert>
           <div class="text-body-2">
             The customer's DL, DL number and ID must all be verified before a vehicle can be
-            assigned. If you can't verify them, ask your manager or contact the support team.
+            assigned.
+          </div>
+          <!-- Same split as the old bookingDetails.vue: Outreach steps for
+               Ontrack agents, "ask your manager" for lessor agents. -->
+          <div class="text-body-2 text-medium-emphasis mt-3 mb-1">Process for DL Verification</div>
+          <ol v-if="authStore.canViewAdmin" class="text-body-2 pl-5">
+            <li>
+              Sign in to
+              <a href="https://ontrack-outreach.web.app/" target="_blank" rel="noopener"
+                >outreach app</a
+              >.
+            </li>
+            <li>Navigate to Customer Tab &gt; Search for phone number</li>
+            <li>Navigate to KYC Info tab and click on 'Digitally Verify'</li>
+            <li>Enter DL Number and Date of birth to verify</li>
+          </ol>
+          <div v-else class="text-body-2">
+            If you don't have access to outreach app, please ask your manager or contact support
+            team.
           </div>
         </v-card-text>
         <v-card-actions>
@@ -546,11 +567,14 @@ async function confirmAssign() {
           <v-btn variant="text" rounded="lg" @click="docsNotVerifiedDialog = false">
             I'll do it later
           </v-btn>
+
           <v-btn
             color="success"
             variant="flat"
             rounded="lg"
-            :to="{ name: 'customer-detail', params: { customerId: bookingData.customer } }"
+            :href="`https://ontrack-outreach.web.app/customer/${bookingData.customer}`"
+            target="_blank"
+            rel="noopener"
           >
             Verify Now
           </v-btn>

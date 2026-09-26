@@ -78,4 +78,21 @@ describe('auth store', () => {
     expect(store.user).toBeNull()
     expect(tokenStorage.getToken()).toBeNull()
   })
+
+  it('canViewAdmin is true only for a user with lessor: null, regardless of role', () => {
+    const store = useAuthStore()
+    expect(store.canViewAdmin).toBe(false) // no user loaded yet
+
+    store.user = { role: 'AGENT', lessor: null }
+    expect(store.canViewAdmin).toBe(true)
+
+    store.user = { role: 'ADMIN', lessor: 1 }
+    expect(store.canViewAdmin).toBe(false)
+
+    store.user = { role: 'ADMIN', lessor: 0 }
+    expect(store.canViewAdmin).toBe(false)
+
+    store.user = { role: 'ADMIN' } // field missing
+    expect(store.canViewAdmin).toBe(false)
+  })
 })
